@@ -29,7 +29,13 @@ export async function POST(req: NextRequest) {
     const pdf = await renderLive(
       `${req.nextUrl.origin}/print/live`,
       { templateId: tpl.id, data: normalizeCv(body.data) },
-      async () => {},
+      async (page) => {
+        // Ukur dengan lebar & media yang sama persis dengan kertas cetak, supaya "pas halaman" akurat
+        const mm = 96 / 25.4;
+        const width = Math.round((210 - parseFloat(tpl.pdfMargin.left) - parseFloat(tpl.pdfMargin.right)) * mm);
+        await page.setViewport({ width, height: 1123 });
+        await page.emulateMediaType("print");
+      },
       (page) => page.pdf({ format: "A4", printBackground: true, margin: tpl.pdfMargin, preferCSSPageSize: false }),
     );
     return new NextResponse(Buffer.from(pdf), {

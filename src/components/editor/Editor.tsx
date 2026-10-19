@@ -215,7 +215,7 @@ export default function Editor({
           </div>
           <div className={`overflow-y-auto overscroll-contain bg-[#e9e5dd] p-3 pb-safe sm:p-4 lg:p-8 ${tab === "preview" ? "block" : "hidden"} md:block`}>
             <div className="mx-auto max-w-[680px]">
-              <CvPreview data={data} templateId={templateId} watermark={!pro} />
+              <CvPreview data={data} templateId={templateId} watermark={!pro} showFitNote />
               {showAds(access) && <AdSlot className="mt-6" placement="editor" />}
               {!pro && (
                 <p className="mt-3 text-center text-xs text-muted">

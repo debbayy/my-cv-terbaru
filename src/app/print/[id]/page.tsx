@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { verifyPrintToken } from "@/lib/print-token";
 import { normalizeCv } from "@/lib/cv";
 import { getTemplate } from "@/lib/templates";
+import CvSheet from "@/components/cv/CvSheet";
 
 export const dynamic = "force-dynamic";
 export const metadata = { robots: { index: false, follow: false } };
@@ -26,7 +27,7 @@ export default async function PrintPage({
   const tpl = getTemplate(cv.template_id);
   return (
     <div className="cv-page" style={{ width: "auto", minHeight: "auto" }}>
-      <tpl.Component data={normalizeCv(cv.data)} />
+      <CvSheet data={normalizeCv(cv.data)} templateId={tpl.id} />
     </div>
   );
 }

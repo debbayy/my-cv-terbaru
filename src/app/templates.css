@@ -274,7 +274,7 @@
 .tpl-dark h1 span:last-child { color: #c3f73a; }
 .tpl-dark .headline { margin-top: 5pt; color: #c3f73a; font-weight: 600; }
 .tpl-dark .block { margin-top: 8mm; overflow-wrap: anywhere; }
-.tpl-dark h4 { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 8.5pt; color: #8b93a1; margin-bottom: 3pt; }
+.tpl-dark h4 { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 8.5pt; color: #8b93a1; margin-bottom: 3pt; }
 .tpl-dark .skill { border-left: 2pt solid #c3f73a; padding-left: 5pt; margin-bottom: 2pt; }
 .tpl-dark main { padding: 16mm 12mm 12mm; }
 .tpl-dark section + section { margin-top: 10pt; }
@@ -282,7 +282,7 @@
 .tpl-dark h2::before { content: "▍"; color: #9acd32; }
 .tpl-dark h3 { font-size: 10.5pt; font-weight: 600; }
 .tpl-dark .row { display: flex; justify-content: space-between; align-items: baseline; gap: 6pt; }
-.tpl-dark .date { font-family: ui-monospace, Menlo, monospace; font-size: 8pt; color: #6b7280; white-space: nowrap; }
+.tpl-dark .date { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 8pt; color: #6b7280; white-space: nowrap; }
 .tpl-dark .at { color: #555; }
 .tpl-dark .item { margin-bottom: 8pt; }
 
@@ -294,3 +294,9 @@
 .tpl-mheader header.has-photo { padding-right: 52mm; position: relative; }
 .tpl-mheader header .photo { position: absolute; right: 14mm; top: 50%; transform: translateY(-50%); width: 30mm; height: 30mm; border-radius: 50%; object-fit: cover; border: 1.2mm solid #f4a48e; }
 .tpl-dark .photo { width: 34mm; height: 40mm; object-fit: cover; border-radius: 2mm; margin-bottom: 6mm; border: .8mm solid #c3f73a; display: block; }
+
+/* Pas 1 halaman: template full-bleed yang diperkecil tetap setinggi kertas */
+.cv-fit[data-fullbleed="1"] > :first-child { min-height: calc(296mm / var(--fit)) !important; }
+/* Garis batas halaman di preview (PDF memotong di sini) */
+.cv-pagebreak { position: absolute; left: 0; right: 0; border-top: 2px dashed #e0565b; pointer-events: none; z-index: 5; }
+.cv-pagebreak span { position: absolute; right: 8px; top: 4px; background: #e0565b; color: #fff; font: 600 11px/1 Inter, sans-serif; padding: 4px 6px; border-radius: 4px; }
