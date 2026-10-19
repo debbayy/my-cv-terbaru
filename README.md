@@ -1,1 +1,105 @@
-# my-cv-terbaru
+# CVku — Web Pembuat CV ATS
+
+Next.js 16 (App Router) · Supabase (auth + DB) · Midtrans (QRIS/e-wallet/VA) · Puppeteer (PDF berbasis teks)
+
+**Model bisnis:** semua template gratis untuk diedit & di-preview (dengan watermark). Download PDF hanya untuk user **Pro — Rp50.000 / 30 hari** (bukan auto-debit; perpanjangan ditambahkan ke sisa masa aktif).
+
+---
+
+## Setup (± 15 menit)
+
+### 1. Install
+```bash
+npm install          # juga mendownload Chrome untuk puppeteer (dipakai saat dev lokal)
+cp .env.example .env.local
+```
+
+### 2. Supabase
+1. Buat project di supabase.com
+2. **SQL Editor** → paste isi `supabase/schema.sql` → Run
+3. **Project Settings → API** → isi `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` di `.env.local`
+4. **Authentication → URL Configuration**
+   - Site URL: `http://localhost:3000` (nanti ganti domain production)
+   - Redirect URLs: tambahkan `http://localhost:3000/auth/callback` dan `https://domainkamu.com/auth/callback`
+5. (Opsional) **Authentication → Providers → Google** untuk login Google
+6. (Opsional, dev) matikan "Confirm email" supaya daftar langsung masuk
+
+### 3. Midtrans
+1. Daftar di midtrans.com → pakai **Sandbox** dulu
+2. **Settings → Access Keys** → salin Server Key ke `MIDTRANS_SERVER_KEY`
+3. **Settings → Payment → Notification URL**: `https://domainkamu.com/api/webhooks/midtrans`
+   - Untuk tes lokal pakai tunnel: `npx cloudflared tunnel --url http://localhost:3000` lalu pakai URL-nya
+4. Tes bayar pakai simulator: https://simulator.sandbox.midtrans.com
+
+### 4. Secret & jalankan
+```bash
+# isi PRINT_SECRET dengan:
+openssl rand -hex 32
+
+npm run dev
+```
+
+---
+
+## Cara kerja paywall (penting)
+
+```
+Editor (browser)                     Server
+────────────────                     ──────
+Preview + watermark   ──Download──▶  /api/cv/[id]/pdf
+Ctrl+P diblokir CSS                    1. cek login
+                                       2. cek CV milik user (RLS)
+                                       3. cek profiles.pro_until > now   ← paywall
+                                       4. buat token HMAC 60 detik
+                                       5. Chromium buka /print/[id]?token=…
+                                       6. page.pdf() → PDF teks asli
+```
+
+- `pro_until` **tidak bisa diubah user** (tidak ada RLS policy UPDATE). Hanya webhook (service role) lewat fungsi `activate_pro()` yang idempotent.
+- Harga diambil dari `src/lib/plans.ts` di server, bukan dari client. Webhook juga mencocokkan nominal + verifikasi `signature_key`.
+- `/print/[id]` menolak semua request tanpa token valid.
+
+## Struktur
+
+```
+src/
+  app/
+    page.tsx                 landing + galeri template
+    login/                   email/password + Google
+    dashboard/               daftar CV, status Pro
+    editor/[id]/             editor (form kiri, preview kanan, tab di mobile)
+    pricing/                 paket + tombol checkout
+    new/route.ts             /new?template=… → bikin CV lalu buka editor
+    print/[id]/              halaman yang dirender Chromium jadi PDF
+    api/cv/[id]/pdf/         generate PDF (cek Pro)
+    api/checkout/            buat transaksi Midtrans Snap
+    api/webhooks/midtrans/   aktivasi Pro
+    templates.css            CSS template — sama untuk preview & PDF
+  components/templates/      AtsClassic, AtsModern, Creative
+  lib/
+    templates/index.ts       registry template (tambah template baru di sini)
+    plans.ts                 harga & durasi paket
+    cv.ts                    tipe data CV + contoh
+supabase/schema.sql
+```
+
+## Menambah template
+1. Buat komponen di `src/components/templates/NamaBaru.tsx` (terima `{ data: CvData }`)
+2. Tambah style dengan prefix `.tpl-namabaru` di `src/app/templates.css`
+3. Daftarkan di `src/lib/templates/index.ts` (`ats: true/false`, `pdfMargin`)
+
+Tips ATS: 1 kolom, judul bagian standar (Pengalaman, Pendidikan, Keahlian), tanpa tabel/ikon untuk info penting, jangan taruh teks di gambar.
+
+## Menambah paket (mis. sekali bayar 7 hari)
+Tambah entri di `PLANS` (`src/lib/plans.ts`) lalu tambahkan kartu/tombol di `src/app/pricing/page.tsx` dengan `plan="pro_weekly"`. Webhook otomatis memakai `days` dari paket.
+
+## Deploy ke Vercel
+- Set semua env di Vercel, dan `APP_URL=https://domainkamu.com`
+- Di Vercel, PDF otomatis memakai `@sparticuz/chromium` (lihat `src/lib/browser.ts`). Jika function kena limit ukuran, set **Function Memory 1024 MB+**.
+- Ganti `MIDTRANS_IS_PRODUCTION=true` + Server Key production setelah akun Midtrans disetujui.
+
+## Next step yang disarankan
+- Mode tamu: boleh isi CV tanpa login (simpan di localStorage), login saat mau download
+- Email pengingat 3 hari sebelum Pro habis
+- Import data dari LinkedIn / CV lama (PDF)
+- Cek skor ATS: cocokkan keyword CV dengan deskripsi lowongan

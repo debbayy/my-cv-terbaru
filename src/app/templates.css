@@ -1,0 +1,117 @@
+/* =========================================================
+   Gaya template CV — dipakai preview di editor DAN halaman /print.
+   Satu sumber CSS supaya PDF = yang terlihat di layar.
+   Ukuran pakai pt/mm agar konsisten saat dicetak.
+   ========================================================= */
+
+.cv-page {
+  width: 210mm;
+  min-height: 297mm;
+  background: #fff;
+  color: #1f2328;
+  box-sizing: border-box;
+  position: relative;
+}
+.cv-page.pad { padding: 14mm 16mm; }
+
+.cv-page ul { margin: 2pt 0 0; padding-left: 13pt; list-style: disc; }
+.cv-page li { margin: 1.5pt 0; }
+.cv-page p { margin: 0; }
+.cv-page h1, .cv-page h2, .cv-page h3, .cv-page h4 { margin: 0; }
+.cv-page .item, .cv-page li { break-inside: avoid; }
+.cv-page h2 { break-after: avoid; }
+
+/* ---------------- ATS CLASSIC ---------------- */
+.tpl-classic { font-family: "Source Sans 3", Arial, sans-serif; font-size: 10.5pt; line-height: 1.4; }
+.tpl-classic header { text-align: center; margin-bottom: 10pt; }
+.tpl-classic h1 { font-family: "Source Serif 4", Georgia, serif; font-size: 22pt; font-weight: 700; letter-spacing: .3pt; }
+.tpl-classic .headline { font-size: 11.5pt; margin-top: 2pt; }
+.tpl-classic .contact { font-size: 9.5pt; color: #444; margin-top: 4pt; }
+.tpl-classic section { margin-top: 10pt; }
+.tpl-classic h2 {
+  font-family: "Source Serif 4", Georgia, serif; font-size: 11.5pt; text-transform: uppercase;
+  letter-spacing: 1pt; border-bottom: 1px solid #222; padding-bottom: 2pt; margin-bottom: 6pt;
+}
+.tpl-classic .item { margin-bottom: 7pt; }
+.tpl-classic .row { display: flex; justify-content: space-between; gap: 8pt; }
+.tpl-classic .row.sub { font-style: italic; color: #333; }
+.tpl-classic section > p + p { margin-top: 2pt; }
+
+/* ---------------- ATS MODERN ---------------- */
+.tpl-modern { font-family: "Inter", Arial, sans-serif; font-size: 10pt; line-height: 1.45; }
+.tpl-modern header { border-left: 4pt solid #2f5d50; padding-left: 10pt; margin-bottom: 12pt; }
+.tpl-modern h1 { font-size: 22pt; font-weight: 700; letter-spacing: -.3pt; }
+.tpl-modern .headline { color: #2f5d50; font-weight: 600; font-size: 11pt; margin-top: 1pt; }
+.tpl-modern .contact { color: #555; font-size: 9pt; margin-top: 4pt; }
+.tpl-modern section { margin-top: 11pt; }
+.tpl-modern h2 {
+  font-size: 9.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2pt;
+  color: #2f5d50; margin-bottom: 5pt;
+}
+.tpl-modern h3 { font-size: 10.5pt; font-weight: 600; }
+.tpl-modern .at { font-weight: 400; color: #444; }
+.tpl-modern .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8pt; }
+.tpl-modern .date { font-size: 9pt; color: #666; white-space: nowrap; }
+.tpl-modern .loc { font-size: 9pt; color: #666; }
+.tpl-modern .item { margin-bottom: 8pt; }
+
+/* ---------------- CREATIVE (non-ATS) ---------------- */
+.tpl-creative {
+  display: grid; grid-template-columns: 68mm 1fr; min-height: 297mm;
+  font-family: "Inter", Arial, sans-serif; font-size: 9.5pt; line-height: 1.45;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.tpl-creative aside { background: #234639; color: #e9efe9; padding: 16mm 8mm 12mm; }
+.tpl-creative .avatar {
+  width: 26mm; height: 26mm; border-radius: 50%; background: #e8b44a; color: #234639;
+  display: grid; place-items: center; font-family: "Poppins", sans-serif; font-weight: 700; font-size: 20pt;
+  margin: 0 auto 10mm;
+}
+.tpl-creative .block { margin-bottom: 7mm; overflow-wrap: anywhere; }
+.tpl-creative h4 {
+  font-family: "Poppins", sans-serif; font-size: 9pt; letter-spacing: 1.5pt; text-transform: uppercase;
+  color: #e8b44a; margin-bottom: 3pt;
+}
+.tpl-creative aside p { margin-bottom: 2pt; }
+.tpl-creative .chips { display: flex; flex-wrap: wrap; gap: 3pt; }
+.tpl-creative .chips span { background: rgba(255,255,255,.12); border-radius: 3pt; padding: 1.5pt 5pt; font-size: 8.5pt; }
+.tpl-creative .muted { opacity: .7; }
+.tpl-creative main { padding: 16mm 12mm 12mm; }
+.tpl-creative h1 { font-family: "Poppins", sans-serif; font-size: 25pt; line-height: 1.1; font-weight: 700; color: #234639; }
+.tpl-creative .headline { font-size: 12pt; color: #b0832a; font-weight: 600; margin-top: 3pt; }
+.tpl-creative .summary { margin: 8pt 0 2pt; color: #333; }
+.tpl-creative section { margin-top: 10pt; }
+.tpl-creative h2 {
+  font-family: "Poppins", sans-serif; font-size: 12pt; color: #234639;
+  border-bottom: 2pt solid #e8b44a; display: inline-block; padding-bottom: 1pt; margin-bottom: 7pt;
+}
+.tpl-creative .item { position: relative; padding-left: 9pt; border-left: 1.5pt solid #d6dcd6; margin-bottom: 8pt; }
+.tpl-creative .date { font-size: 8.5pt; color: #777; }
+.tpl-creative h3 { font-size: 10.5pt; font-weight: 600; }
+.tpl-creative .at { color: #555; font-size: 9pt; }
+
+/* ---------------- Watermark (preview saja, tidak pernah ada di /print) ---------------- */
+.cv-watermark {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5;
+  background-image: repeating-linear-gradient(-30deg, transparent 0 120px, rgba(47,93,80,.06) 120px 122px);
+}
+.cv-watermark span {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) rotate(-30deg);
+  font: 700 64px/1 "Inter", sans-serif; color: rgba(47,93,80,.10); white-space: nowrap; letter-spacing: 6px;
+}
+
+/* Halaman /print: kertas putih polos, margin diatur Puppeteer */
+@media print {
+  html, body { background: #fff !important; }
+  .cv-page { width: auto; min-height: auto; }
+  .cv-page.pad { padding: 0; }
+}
+/* Blokir Ctrl+P di editor supaya paywall tidak dibobol lewat "Save as PDF" browser */
+@media print {
+  .no-print-app { display: none !important; }
+  .no-print-app-msg { display: block !important; }
+}
+.no-print-app-msg { display: none; }
+
+/* Template full-bleed: sedikit di bawah 297mm supaya tidak tumpah ke halaman 2 karena pembulatan */
+@media print { .tpl-creative { min-height: 296mm; } }
