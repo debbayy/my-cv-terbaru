@@ -210,3 +210,7 @@ as $$
   update public.profiles set free_downloads_used = greatest(free_downloads_used - 1, 0) where id = p_user;
 $$;
 revoke all on function public.refund_free_download(uuid) from public, anon, authenticated;
+
+
+-- ---------- OWNER (lihat migration-005-owner.sql) ----------
+-- Jalankan migration-005-owner.sql setelah schema ini untuk menjadikan dbts92@gmail.com Pro Max permanen.

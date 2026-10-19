@@ -100,7 +100,7 @@ Sudah pernah menjalankan `schema.sql` versi lama? Jalankan `supabase/migration-0
 | Pro (tanpa iklan) | Rp50.000 / 30 hari | 2 template pertama di tiap kategori (CV ATS, CV desain bebas, tiap acara kartu) |
 | Pro Max (tanpa iklan) | Rp99.000 / 30 hari | Semua template |
 
-Harga di `src/lib/plans.ts`. Pembagian Pro/Pro Max otomatis: urutan template di registry — 2 teratas tiap kategori = Pro (`PRO_PER_CATEGORY`). Wajib jalankan `supabase/migration-003-promax.sql` dan `supabase/migration-004-free-download.sql`.
+Harga di `src/lib/plans.ts`. Pembagian Pro/Pro Max otomatis: urutan template di registry — 2 teratas tiap kategori = Pro (`PRO_PER_CATEGORY`). Wajib jalankan `supabase/migration-003-promax.sql` dan `supabase/migration-004-free-download.sql`. Akun owner: `migration-005-owner.sql` (Pro Max permanen untuk dbts92@gmail.com; `/admin` juga hanya untuk email ini).
 
 ### Iklan (Google AdSense)
 Set `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-…` (dan opsional `NEXT_PUBLIC_ADSENSE_SLOT_DEFAULT`) di Vercel. `/ads.txt` otomatis. Selama kosong, slot iklan menampilkan promo upgrade. Iklan tidak pernah tampil untuk Pro/Pro Max.
