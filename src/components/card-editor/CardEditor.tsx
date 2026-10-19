@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { OCCASIONS, type CardData } from "@/lib/card";
 import { CARD_TEMPLATES, getCardTemplate } from "@/lib/card-templates";
 import { saveCardDraft } from "@/lib/card-draft";
-import { canDownload, type Access } from "@/lib/access";
+import { canDownload, showAds, type Access } from "@/lib/access";
+import AdSlot from "@/components/ads/AdSlot";
 import { saveBlob } from "@/lib/save-blob";
 import { PLANS, rupiah } from "@/lib/plans";
 import CardPreview from "./CardPreview";
@@ -70,7 +71,10 @@ export default function CardEditor({
     try {
       if (!saved && !(await persist())) throw new Error("Gagal menyimpan perubahan terakhir.");
       const res = await fetch(`/api/card/${id}/export?format=${format}`);
-      if (res.status === 402) { setPaywall(true); return; }
+      if (res.status === 402) {
+        router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
+        return;
+      }
       if (!res.ok) throw new Error("Gagal membuat file. Coba lagi sebentar.");
       const blob = await res.blob();
       const name = `Kartu - ${data.headline.replace(/[^\w\- ]+/g, "").trim() || "Ucapan"}.${format}`;
@@ -179,6 +183,7 @@ export default function CardEditor({
           <div className="order-1 md:order-2">
             <div className="mx-auto max-w-[360px] md:sticky md:top-20 md:max-w-none">
               <CardPreview data={data} templateId={templateId} watermark={!pro} />
+              {showAds(access) && <AdSlot className="mt-4" placement="editor" />}
               <p className="mt-2 text-center text-xs text-muted">
                 PNG 1080×1350 — pas untuk WhatsApp & Instagram. PDF untuk dicetak.
               </p>

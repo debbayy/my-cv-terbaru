@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Ad from "@/components/ads/Ad";
+import { Fragment } from "react";
 import CardPreview from "@/components/card-editor/CardPreview";
 import { CARD_TEMPLATES } from "@/lib/card-templates";
 import { OCCASIONS, type Occasion } from "@/lib/card";
@@ -33,8 +35,10 @@ export default function KartuGallery() {
           ))}
         </nav>
 
-        {groups.map((g) => (
-          <section key={g.o} id={g.o} className="mt-10 scroll-mt-20">
+        {groups.map((g, gi) => (
+          <Fragment key={g.o}>
+          {gi > 0 && gi % 4 === 0 && <Ad placement="gallery" className="mt-10" />}
+          <section id={g.o} className="mt-10 scroll-mt-20">
             <h2 className="text-xl font-bold">{OCCASIONS[g.o]}</h2>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
               {g.items.map((t) => (
@@ -50,6 +54,7 @@ export default function KartuGallery() {
               ))}
             </div>
           </section>
+          </Fragment>
         ))}
       </main>
       <Footer />

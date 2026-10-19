@@ -4,7 +4,8 @@ import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { getTemplate, TEMPLATES } from "@/lib/templates";
 import { rupiah } from "@/lib/plans";
-import { getAccess } from "@/lib/access";
+import { getAccess, showAds } from "@/lib/access";
+import AdSlot from "@/components/ads/AdSlot";
 import { deleteCard, deleteCv } from "./actions";
 import { getCardTemplate } from "@/lib/card-templates";
 import { OCCASIONS } from "@/lib/card";
@@ -47,7 +48,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                   <>Pro aktif sampai <strong>{fmt(access.proUntil!)}</strong> · <Link href="/pricing" className="font-semibold text-brand">Upgrade ke Pro Max</Link> untuk semua template</>
                 )
               ) : (
-                <>Akun gratis · <Link href="/pricing" className="font-semibold text-brand">Upgrade ke Pro</Link> untuk download PDF</>
+                <>
+                  Akun gratis · {access.freeLeft > 0 ? "sisa 1x download gratis CV ATS" : "jatah download gratis sudah terpakai"} ·{" "}
+                  <Link href="/pricing" className="font-semibold text-brand">Upgrade, tanpa iklan</Link>
+                </>
               )}
             </p>
           </div>
@@ -55,6 +59,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             <button className="text-sm text-muted hover:text-ink">Keluar</button>
           </form>
         </div>
+
+        {showAds(access) && <AdSlot placement="dashboard" className="mb-8" />}
 
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Mulai CV baru</h2>
         <div className="mb-10 flex flex-wrap gap-2 sm:gap-3">

@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { signPrintToken } from "@/lib/print-token";
 import { launchBrowser } from "@/lib/browser";
 import { getTemplate } from "@/lib/templates";
-import { canDownload, getAccess } from "@/lib/access";
+import { canDownload, canUseFree, getAccess } from "@/lib/access";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -20,9 +21,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!cv) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   // 2) Cek paket: template Pro butuh Pro/Pro Max, template Pro Max butuh Pro Max. INI paywall-nya.
-  const tier = getTemplate(cv.template_id).tier;
-  if (!canDownload(tier, await getAccess(supabase, user.id)))
-    return NextResponse.json({ error: `${tier}_required`, need: tier }, { status: 402 });
+  const tpl0 = getTemplate(cv.template_id);
+  const tier = tpl0.tier;
+  const access = await getAccess(supabase, user.id);
+  let usingFree = false;
+  if (!canDownload(tier, access)) {
+    // Akun gratis: 1x download khusus CV ATS — kuota dipotong atomic di database
+    if (canUseFree(tpl0.ats, access)) {
+      const { data: ok } = await createAdminClient().rpc("use_free_download", { p_user: user.id, p_limit: 1 });
+      usingFree = ok === true;
+    }
+    if (!usingFree) return NextResponse.json({ error: `${tier}_required`, need: tier }, { status: 402 });
+  }
 
   // 3) Render /print/[id] di Chromium → PDF berbasis teks
   const base = appUrl(req.nextUrl.origin);
@@ -51,6 +61,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     });
   } catch (e) {
     console.error("[pdf]", e);
+    // Gagal membuat PDF → kembalikan kuota gratis yang terpakai
+    if (usingFree) await createAdminClient().rpc("refund_free_download", { p_user: user.id }).then(() => {}, () => {});
     return NextResponse.json({ error: "pdf_failed" }, { status: 500 });
   } finally {
     await browser.close();

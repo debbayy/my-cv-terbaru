@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Ad from "@/components/ads/Ad";
 import CvPreview from "@/components/editor/CvPreview";
 import { sampleCv } from "@/lib/cv";
 import { TEMPLATES } from "@/lib/templates";
@@ -53,6 +54,8 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        <div className="mx-auto max-w-6xl px-4 pt-10"><Ad placement="landing" /></div>
 
         {/* TEMPLATE */}
         <section id="template" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-16">
@@ -108,6 +111,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <div className="mx-auto max-w-6xl px-4 pb-10"><Ad placement="landing" /></div>
 
         {/* CTA HARGA */}
         <section className="mx-auto max-w-6xl px-4 pb-20">

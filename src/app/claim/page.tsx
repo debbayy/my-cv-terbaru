@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { canDownload, getAccess } from "@/lib/access";
+import { canDownload, canUseFree, getAccess } from "@/lib/access";
 import { getTemplate } from "@/lib/templates";
 import { clearDraft, loadDraft } from "@/lib/draft";
 
@@ -36,7 +36,9 @@ export default function ClaimPage() {
       clearDraft();
       const after = `/editor/${data.id}?download=1`;
       const tier = getTemplate(draft.templateId).tier;
-      const pro = canDownload(tier, await getAccess(supabase, user.id));
+      const acc = await getAccess(supabase, user.id);
+      // Punya paket, atau masih ada jatah gratis untuk CV ATS → langsung download
+      const pro = canDownload(tier, acc) || canUseFree(getTemplate(draft.templateId).ats, acc);
       // Belum Pro → langsung ke halaman bayar QRIS; setelah lunas otomatis kembali & download
       router.replace(pro ? after : `/bayar?need=${tier}&next=${encodeURIComponent(after)}`);
     })();

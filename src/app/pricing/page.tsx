@@ -30,7 +30,7 @@ export default async function Pricing() {
       <Navbar />
       <main className="pb-safe mx-auto max-w-6xl px-4 py-10 sm:py-14">
         <h1 className="font-display text-center text-3xl font-bold sm:text-4xl">Harga simpel</h1>
-        <p className="mt-2 text-center text-muted">Isi dan preview semua template selalu gratis. Bayar hanya saat mau download.</p>
+        <p className="mt-2 text-center text-muted">Isi dan preview semua template selalu gratis. Coba download CV ATS gratis 1x.</p>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {/* GRATIS */}
@@ -40,8 +40,10 @@ export default async function Pricing() {
             <ul className="mt-6 space-y-2 text-sm">
               <li>✓ Isi & preview semua {TEMPLATES.length} template CV</li>
               <li>✓ Isi & preview semua {CARD_TEMPLATES.length} kartu ucapan</li>
+              <li>✓ <strong>1x download gratis</strong> khusus CV ATS</li>
               <li>✓ Simpan di akun</li>
-              <li className="text-muted">✗ Download</li>
+              <li className="text-muted">✗ Download kartu & CV desain bebas</li>
+              <li className="text-muted">✗ Ada iklan</li>
             </ul>
           </div>
 
@@ -57,6 +59,7 @@ export default async function Pricing() {
               <li>✓ {cardPro} kartu ucapan untuk semua acara</li>
               <li>✓ PDF tanpa watermark, terbaca ATS</li>
               <li>✓ Download tanpa batas jumlah</li>
+              <li>✓ <strong>Tanpa iklan</strong></li>
             </ul>
             <Link href={href(pro.id)} className="btn-primary mt-7 w-full py-3 text-base">
               {access.pro && !access.promax ? "Perpanjang Pro" : "Pilih Pro"}
@@ -78,7 +81,7 @@ export default async function Pricing() {
               <li>✓ {TEMPLATES.length} template CV, termasuk koleksi ★ Pro Max</li>
               <li>✓ {CARD_TEMPLATES.length} kartu ucapan, semua desain</li>
               <li>✓ Template baru otomatis ikut terbuka</li>
-              <li>✓ Semua fitur Pro</li>
+              <li>✓ <strong>Tanpa iklan</strong> · semua fitur Pro</li>
             </ul>
             <Link href={href(max.id)} className="btn-gold mt-7 w-full py-3 text-base">
               {access.promax ? "Perpanjang Pro Max" : "Pilih Pro Max"}

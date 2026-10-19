@@ -7,7 +7,8 @@ import { saveBlob } from "@/lib/save-blob";
 import { createClient } from "@/lib/supabase/client";
 import type { CvData } from "@/lib/cv";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
-import { canDownload, type Access } from "@/lib/access";
+import { canDownload, showAds, type Access } from "@/lib/access";
+import AdSlot from "@/components/ads/AdSlot";
 import { PLANS, rupiah } from "@/lib/plans";
 import CvForm from "./CvForm";
 import CvPreview from "./CvPreview";
@@ -27,6 +28,9 @@ export default function Editor({
   const [templateId, setTemplateId] = useState(initialTemplate);
   const tier = getTemplate(templateId).tier;
   const pro = canDownload(tier, access); // boleh download template ini?
+  const [freeLeft, setFreeLeft] = useState(access.freeLeft);
+  const isAts = getTemplate(templateId).ats;
+  const free = !pro && isAts && freeLeft > 0; // jatah download gratis (khusus CV ATS)
   const [data, setData] = useState(initialData);
   const [save, setSave] = useState<SaveState>("saved");
   const [tab, setTab] = useState<"form" | "preview">("form");
@@ -68,7 +72,7 @@ export default function Editor({
     if (!autoDownload || autoDone.current) return;
     autoDone.current = true;
     router.replace(`/editor/${id}`, { scroll: false });
-    download();
+    download({ auto: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoDownload]);
 
@@ -79,7 +83,7 @@ export default function Editor({
     return () => window.removeEventListener("beforeunload", h);
   }, [save]);
 
-  async function download() {
+  async function download(opts?: { auto?: boolean }) {
     setError(null);
     // Tamu: simpan draft, lalu minta login. Setelah login, /claim memindahkan draft ke akun
     // dan membuka editor lagi dengan ?download=1 supaya alurnya langsung lanjut.
@@ -89,8 +93,10 @@ export default function Editor({
       router.push(user ? "/claim" : "/login?next=/claim&reason=download");
       return;
     }
-    // Belum Pro → langsung ke halaman bayar QRIS, setelah lunas kembali & download otomatis
-    if (!pro) {
+    // Akun gratis + CV ATS: konfirmasi pakai jatah 1x
+    if (free && !opts?.auto && !window.confirm("Download gratis hanya 1x. Pastikan CV kamu sudah final. Lanjut download?")) return;
+    // Belum Pro (dan bukan jatah gratis) → langsung ke halaman bayar QRIS, setelah lunas kembali & download otomatis
+    if (!pro && !free) {
       await persist();
       router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
       return;
@@ -99,11 +105,16 @@ export default function Editor({
     try {
       if (save !== "saved" && !(await persist())) throw new Error("Gagal menyimpan perubahan terakhir.");
       const res = await fetch(`/api/cv/${id}/pdf`);
-      if (res.status === 402) { setPaywall(true); return; }
+      if (res.status === 402) {
+        setFreeLeft(0);
+        router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
+        return;
+      }
       if (!res.ok) throw new Error("Gagal membuat PDF. Coba lagi sebentar.");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       saveBlob(url, `${(data.personal.fullName || title).replace(/[^\w\- ]+/g, "").trim() || "CV"} - CV.pdf`);
+      if (free) setFreeLeft(0);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
     } finally {
@@ -133,9 +144,13 @@ export default function Editor({
               <option key={t.id} value={t.id}>{t.name}{t.ats ? " (ATS)" : ""}{t.tier === "promax" ? " ★ Pro Max" : ""}</option>
             ))}
           </select>
-          <button onClick={download} disabled={downloading} className="btn-primary shrink-0">
-            {downloading ? "Membuat PDF…" : "Download PDF"}
-            {!pro && !guest && <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">{tier === "promax" ? "PRO MAX" : "PRO"}</span>}
+          <button onClick={() => download()} disabled={downloading} className="btn-primary shrink-0">
+            {downloading ? "Membuat PDF…" : free ? "Download Gratis" : "Download PDF"}
+            {free ? (
+              <span className="rounded bg-white/25 px-1.5 text-[10px] font-bold">1x</span>
+            ) : !pro && !guest && !(guest && isAts) ? (
+              <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">{tier === "promax" ? "PRO MAX" : "PRO"}</span>
+            ) : null}
           </button>
         </header>
 
@@ -143,6 +158,7 @@ export default function Editor({
         {guest && (
           <p className="bg-brand/10 px-4 py-1.5 text-xs text-brand">
             Kamu belum masuk — CV tersimpan otomatis di browser ini. Masuk saat download untuk menyimpannya ke akun.
+            {isAts && " CV ATS bisa di-download gratis 1x."}
           </p>
         )}
         {tpl && !tpl.ats && (
@@ -167,6 +183,7 @@ export default function Editor({
           <div className={`overflow-y-auto overscroll-contain bg-[#e9e5dd] p-3 pb-safe sm:p-4 lg:p-8 ${tab === "preview" ? "block" : "hidden"} md:block`}>
             <div className="mx-auto max-w-[680px]">
               <CvPreview data={data} templateId={templateId} watermark={!pro} />
+              {showAds(access) && <AdSlot className="mt-6" placement="editor" />}
               {!pro && (
                 <p className="mt-3 text-center text-xs text-muted">
                   Watermark hanya ada di preview. {tier === "promax" ? "Template ini termasuk koleksi Pro Max." : "PDF versi Pro bersih & teksnya terbaca ATS."}
