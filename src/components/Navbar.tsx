@@ -23,6 +23,9 @@ export default async function Navbar() {
                 <span className="hidden rounded-full bg-gold px-2 py-0.5 text-xs font-bold min-[420px]:inline">{access.promax ? "PRO MAX" : "PRO"}</span>
               )}
               <Link href="/dashboard" className="btn-primary whitespace-nowrap px-3 sm:px-4">Akun Saya</Link>
+              <form action="/auth/signout" method="post">
+                <button type="submit" className="whitespace-nowrap px-2 py-1 text-muted hover:text-ink">Keluar</button>
+              </form>
             </>
           ) : (
             <Link href="/login" className="btn-primary whitespace-nowrap px-3 sm:px-4">Masuk</Link>
