@@ -1,6 +1,9 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { saveDraft } from "@/lib/draft";
+import { saveBlob } from "@/lib/save-blob";
 import { createClient } from "@/lib/supabase/client";
 import type { CvData } from "@/lib/cv";
 import { TEMPLATES } from "@/lib/templates";
@@ -11,11 +14,14 @@ import CvPreview from "./CvPreview";
 type SaveState = "saved" | "saving" | "dirty" | "error";
 
 export default function Editor({
-  id, initialTitle, initialTemplate, initialData, pro,
+  id, initialTitle, initialTemplate, initialData, pro, guest = false, autoDownload = false,
 }: {
-  id: string; initialTitle: string; initialTemplate: string; initialData: CvData; pro: boolean;
+  /** null = mode tamu (draft di browser, belum login) */
+  id: string | null; initialTitle: string; initialTemplate: string; initialData: CvData; pro: boolean;
+  guest?: boolean; autoDownload?: boolean;
 }) {
   const supabase = useRef(createClient()).current;
+  const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [templateId, setTemplateId] = useState(initialTemplate);
   const [data, setData] = useState(initialData);
@@ -35,10 +41,15 @@ export default function Editor({
     timer.current = null;
     setSave("saving");
     const { title, templateId, data } = latest.current;
+    if (guest || !id) {
+      const ok = saveDraft({ title, templateId, data });
+      setSave(ok ? "saved" : "error");
+      return ok;
+    }
     const { error } = await supabase.from("cvs").update({ title, template_id: templateId, data }).eq("id", id);
     setSave(error ? "error" : "saved");
     return !error;
-  }, [id, supabase]);
+  }, [id, guest, supabase]);
 
   // Autosave 800ms setelah berhenti mengetik
   useEffect(() => {
@@ -47,6 +58,16 @@ export default function Editor({
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(persist, 800);
   }, [title, templateId, data, persist]);
+
+  // Lanjutkan download otomatis setelah login dari mode tamu
+  const autoDone = useRef(false);
+  useEffect(() => {
+    if (!autoDownload || autoDone.current) return;
+    autoDone.current = true;
+    router.replace(`/editor/${id}`, { scroll: false });
+    download();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoDownload]);
 
   // Peringatkan kalau keluar sebelum tersimpan
   useEffect(() => {
@@ -57,6 +78,14 @@ export default function Editor({
 
   async function download() {
     setError(null);
+    // Tamu: simpan draft, lalu minta login. Setelah login, /claim memindahkan draft ke akun
+    // dan membuka editor lagi dengan ?download=1 supaya alurnya langsung lanjut.
+    if (guest || !id) {
+      await persist();
+      const { data: { user } } = await supabase.auth.getUser();
+      router.push(user ? "/claim" : "/login?next=/claim&reason=download");
+      return;
+    }
     if (!pro) { setPaywall(true); return; }
     setDownloading(true);
     try {
@@ -66,11 +95,7 @@ export default function Editor({
       if (!res.ok) throw new Error("Gagal membuat PDF. Coba lagi sebentar.");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${(data.personal.fullName || title).replace(/[^\w\- ]+/g, "").trim() || "CV"} - CV.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
+      saveBlob(url, `${(data.personal.fullName || title).replace(/[^\w\- ]+/g, "").trim() || "CV"} - CV.pdf`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
     } finally {
@@ -83,10 +108,10 @@ export default function Editor({
 
   return (
     <>
-      <div className="no-print-app flex h-screen flex-col">
+      <div className="no-print-app h-app flex flex-col">
         {/* TOP BAR */}
-        <header className="flex flex-wrap items-center gap-3 border-b border-line bg-white px-4 py-2.5">
-          <Link href="/dashboard" className="text-sm text-muted hover:text-ink">← CV Saya</Link>
+        <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-white px-3 py-2.5 sm:px-4" style={{ paddingTop: "max(0.625rem, env(safe-area-inset-top))" }}>
+          <Link href={guest ? "/" : "/dashboard"} className="text-sm text-muted hover:text-ink">{guest ? "← Beranda" : "← CV Saya"}</Link>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -94,18 +119,24 @@ export default function Editor({
             aria-label="Judul CV"
           />
           <span className={`hidden text-xs sm:inline ${save === "error" ? "text-red-600" : "text-muted"}`}>{saveLabel}</span>
-          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="input w-auto py-1.5" aria-label="Template">
+          <div className="h-0 basis-full sm:hidden" aria-hidden />
+          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="input min-w-0 flex-1 py-1.5 sm:w-auto sm:flex-none" aria-label="Template">
             {TEMPLATES.map((t) => (
               <option key={t.id} value={t.id}>{t.name}{t.ats ? " (ATS)" : ""}</option>
             ))}
           </select>
-          <button onClick={download} disabled={downloading} className="btn-primary">
+          <button onClick={download} disabled={downloading} className="btn-primary shrink-0">
             {downloading ? "Membuat PDF…" : "Download PDF"}
-            {!pro && <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">PRO</span>}
+            {!pro && !guest && <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">PRO</span>}
           </button>
         </header>
 
         {error && <p className="bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
+        {guest && (
+          <p className="bg-brand/10 px-4 py-1.5 text-xs text-brand">
+            Kamu belum masuk — CV tersimpan otomatis di browser ini. Masuk saat download untuk menyimpannya ke akun.
+          </p>
+        )}
         {tpl && !tpl.ats && (
           <p className="bg-gold/20 px-4 py-1.5 text-xs">
             Template ini dua kolom & berwarna — bagus untuk dikirim langsung, tapi kurang ideal untuk portal lamaran berbasis ATS.
@@ -121,11 +152,11 @@ export default function Editor({
           ))}
         </div>
 
-        <div className="grid min-h-0 flex-1 md:grid-cols-[minmax(380px,1fr)_1.1fr]">
-          <div className={`overflow-y-auto p-4 ${tab === "form" ? "block" : "hidden"} md:block`}>
+        <div className="grid min-h-0 flex-1 md:grid-cols-[minmax(340px,1fr)_1fr] lg:grid-cols-[minmax(380px,1fr)_1.1fr]">
+          <div className={`overflow-y-auto overscroll-contain p-3 pb-safe sm:p-4 ${tab === "form" ? "block" : "hidden"} md:block`}>
             <CvForm data={data} onChange={setData} />
           </div>
-          <div className={`overflow-y-auto bg-[#e9e5dd] p-4 md:p-8 ${tab === "preview" ? "block" : "hidden"} md:block`}>
+          <div className={`overflow-y-auto overscroll-contain bg-[#e9e5dd] p-3 pb-safe sm:p-4 lg:p-8 ${tab === "preview" ? "block" : "hidden"} md:block`}>
             <div className="mx-auto max-w-[680px]">
               <CvPreview data={data} templateId={templateId} watermark={!pro} />
               {!pro && (
@@ -142,8 +173,8 @@ export default function Editor({
 
       {/* PAYWALL */}
       {paywall && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => setPaywall(false)}>
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 grid place-items-end bg-black/40 p-3 sm:place-items-center sm:p-4" onClick={() => setPaywall(false)}>
+          <div className="pb-safe w-full max-w-md rounded-2xl bg-white p-5 shadow-xl sm:p-6" onClick={(e) => e.stopPropagation()}>
             <p className="mb-2 inline-block rounded-full bg-gold px-2 py-0.5 text-xs font-bold">PRO</p>
             <h2 className="font-display text-2xl font-bold">CV kamu sudah siap 🎉</h2>
             <p className="mt-2 text-muted">
@@ -154,8 +185,8 @@ export default function Editor({
               <li>✓ Semua template, termasuk desain bebas</li>
               <li>✓ Simpan & edit banyak versi CV</li>
             </ul>
-            <div className="mt-6 flex gap-3">
-              <Link href={`/pricing?from=${id}`} className="btn-primary flex-1 py-3">
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-3">
+              <Link href={`/pricing?from=${id ?? ""}`} className="btn-primary flex-1 py-3">
                 Upgrade {rupiah(PLANS.pro_monthly.price)} / 30 hari
               </Link>
               <button onClick={() => setPaywall(false)} className="btn-ghost">Nanti</button>

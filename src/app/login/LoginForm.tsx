@@ -81,7 +81,11 @@ export default function LoginForm() {
   return (
     <>
       <h1 className="text-xl font-bold">{mode === "login" ? "Masuk" : "Buat akun gratis"}</h1>
-      <p className="mb-5 text-sm text-muted">Simpan CV kamu dan edit kapan saja.</p>
+      <p className="mb-5 text-sm text-muted">
+        {params.get("reason") === "download"
+          ? "Satu langkah lagi! Masuk untuk download CV kamu — isian CV kamu tetap aman."
+          : "Simpan CV kamu dan edit kapan saja."}
+      </p>
 
       <button onClick={google} className="btn-ghost mb-4 w-full">
         <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden>

@@ -2,7 +2,7 @@
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <main className="grid min-h-screen place-items-center px-4">
+    <main className="min-h-app grid place-items-center px-4">
       <div className="max-w-md text-center">
         <h1 className="font-display text-3xl font-bold">Ada yang error 😵</h1>
         <p className="mt-2 text-muted">

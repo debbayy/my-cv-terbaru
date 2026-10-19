@@ -2,7 +2,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/config";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED = ["/dashboard", "/editor"];
+const PROTECTED = ["/dashboard", "/editor", "/claim"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -29,7 +29,7 @@ export async function updateSession(request: NextRequest) {
   if (!data.user && PROTECTED.some((p) => path.startsWith(p))) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}`;
+    url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}${path === "/claim" ? "&reason=download" : ""}`;
     return NextResponse.redirect(url);
   }
 

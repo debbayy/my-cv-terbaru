@@ -8,3 +8,10 @@ export async function deleteCv(formData: FormData) {
   await supabase.from("cvs").delete().eq("id", id); // RLS memastikan hanya milik sendiri
   revalidatePath("/dashboard");
 }
+
+export async function deleteCard(formData: FormData) {
+  const id = String(formData.get("id"));
+  const supabase = await createClient();
+  await supabase.from("cards").delete().eq("id", id);
+  revalidatePath("/dashboard");
+}

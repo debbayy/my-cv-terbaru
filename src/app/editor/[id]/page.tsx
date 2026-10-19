@@ -4,8 +4,13 @@ import { normalizeCv } from "@/lib/cv";
 import { isPro } from "@/lib/plans";
 import Editor from "@/components/editor/Editor";
 
-export default async function EditorPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditorPage({
+  params, searchParams,
+}: {
+  params: Promise<{ id: string }>; searchParams: Promise<{ download?: string }>;
+}) {
   const { id } = await params;
+  const { download } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/editor/${id}`);
@@ -23,6 +28,7 @@ export default async function EditorPage({ params }: { params: Promise<{ id: str
       initialTemplate={cv.template_id}
       initialData={normalizeCv(cv.data)}
       pro={isPro(profile?.pro_until)}
+      autoDownload={download === "1"}
     />
   );
 }

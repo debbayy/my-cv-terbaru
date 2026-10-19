@@ -115,3 +115,92 @@
 
 /* Template full-bleed: sedikit di bawah 297mm supaya tidak tumpah ke halaman 2 karena pembulatan */
 @media print { .tpl-creative { min-height: 296mm; } }
+
+/* ---------------- ATS MINIMALIS ---------------- */
+.tpl-minimal { font-family: "Inter", Arial, sans-serif; font-size: 9.5pt; line-height: 1.42; color: #222; }
+.tpl-minimal header { margin-bottom: 10pt; }
+.tpl-minimal h1 { font-size: 19pt; font-weight: 700; letter-spacing: -.2pt; }
+.tpl-minimal .meta { color: #555; font-size: 9pt; margin-top: 2pt; }
+.tpl-minimal section { display: grid; grid-template-columns: 30mm 1fr; gap: 0 6mm; padding: 6pt 0; border-top: .75pt solid #ddd; }
+.tpl-minimal h2 { font-size: 8.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: 1pt; color: #777; padding-top: 1pt; }
+.tpl-minimal .item + .item { margin-top: 5pt; }
+.tpl-minimal .row { display: flex; justify-content: space-between; gap: 8pt; }
+.tpl-minimal .muted { color: #777; white-space: nowrap; }
+.tpl-minimal .body p + p { margin-top: 1.5pt; }
+
+/* ---------------- ATS PROFESIONAL (executive) ---------------- */
+.tpl-exec { font-family: "Source Serif 4", Georgia, serif; font-size: 10.5pt; line-height: 1.4; color: #1a1a1a; }
+.tpl-exec header { text-align: center; padding-bottom: 8pt; border-bottom: 3pt double #1a1a1a; margin-bottom: 8pt; }
+.tpl-exec h1 { font-size: 24pt; font-weight: 700; letter-spacing: 2pt; text-transform: uppercase; }
+.tpl-exec .headline { font-style: italic; font-size: 11.5pt; margin-top: 2pt; }
+.tpl-exec .contact { font-family: "Source Sans 3", Arial, sans-serif; font-size: 9pt; color: #444; margin-top: 4pt; }
+.tpl-exec section { margin-top: 9pt; }
+.tpl-exec h2 {
+  font-size: 10.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5pt; text-align: center;
+  margin-bottom: 5pt; display: flex; align-items: center; gap: 8pt;
+}
+.tpl-exec h2::before, .tpl-exec h2::after { content: ""; flex: 1; border-top: .75pt solid #1a1a1a; }
+.tpl-exec h3 { font-size: 11pt; font-weight: 700; }
+.tpl-exec .item { margin-bottom: 7pt; }
+.tpl-exec .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8pt; }
+.tpl-exec .row.sub { margin-bottom: 1pt; }
+.tpl-exec section > p + p { margin-top: 2pt; }
+
+/* ---------------- ATS FRESH GRADUATE ---------------- */
+.tpl-fresh { font-family: "Source Sans 3", Arial, sans-serif; font-size: 10.5pt; line-height: 1.4; color: #1f2937; }
+.tpl-fresh header { margin-bottom: 10pt; }
+.tpl-fresh h1 { font-size: 22pt; font-weight: 700; color: #1e3a8a; }
+.tpl-fresh .headline { font-size: 11.5pt; font-weight: 600; }
+.tpl-fresh .contact { font-size: 9.5pt; color: #4b5563; margin-top: 3pt; }
+.tpl-fresh section { margin-top: 9pt; }
+.tpl-fresh h2 {
+  font-size: 10.5pt; font-weight: 700; color: #fff; background: #1e3a8a; padding: 2pt 6pt; margin-bottom: 5pt;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.tpl-fresh h3 { font-size: 10.5pt; font-weight: 700; }
+.tpl-fresh .row { display: flex; justify-content: space-between; gap: 8pt; }
+.tpl-fresh .date { color: #4b5563; white-space: nowrap; }
+.tpl-fresh .muted { color: #4b5563; }
+.tpl-fresh .item { margin-bottom: 6pt; }
+.tpl-fresh section > p + p { margin-top: 2pt; }
+
+/* ---------------- MODERN HEADER (non-ATS) ---------------- */
+.tpl-mheader { display: flex; flex-direction: column; font-family: "Inter", Arial, sans-serif; font-size: 9.5pt; line-height: 1.45; color: #1f2430; min-height: 297mm;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.tpl-mheader header { background: #1e2a44; color: #fff; padding: 14mm 14mm 10mm; }
+.tpl-mheader h1 { font-family: "Poppins", sans-serif; font-size: 26pt; font-weight: 700; line-height: 1.05; }
+.tpl-mheader .headline { color: #f4a48e; font-weight: 600; font-size: 12pt; margin-top: 3pt; }
+.tpl-mheader .contact { color: #c9d1e3; font-size: 8.5pt; margin-top: 6pt; }
+.tpl-mheader .cols { flex: 1; display: grid; grid-template-columns: 1fr 66mm; gap: 8mm; padding: 0 0 0 14mm; }
+.tpl-mheader main { padding: 9mm 0 12mm; }
+.tpl-mheader h2 { font-family: "Poppins", sans-serif; font-size: 10.5pt; color: #1e2a44; text-transform: uppercase; letter-spacing: 1pt;
+  border-bottom: 2pt solid #e2725b; padding-bottom: 2pt; margin-bottom: 6pt; }
+.tpl-mheader section + section { margin-top: 10pt; }
+.tpl-mheader h3 { font-size: 10.5pt; font-weight: 600; }
+.tpl-mheader .item { margin-bottom: 8pt; }
+.tpl-mheader .at { color: #555; display: flex; justify-content: space-between; gap: 6pt; }
+.tpl-mheader .date { color: #888; font-size: 8.5pt; white-space: nowrap; }
+.tpl-mheader aside { background: #f4f1ec; padding: 9mm 12mm 12mm 7mm; }
+.tpl-mheader aside h3 { font-size: 9.5pt; }
+.tpl-mheader .chips { display: flex; flex-wrap: wrap; gap: 3pt; }
+.tpl-mheader .chips span { background: #fff; border: .75pt solid #e0dbd2; border-radius: 3pt; padding: 1pt 5pt; font-size: 8.5pt; }
+
+/* ---------------- BOLD TIMELINE (non-ATS) ---------------- */
+.tpl-bold { font-family: "Inter", Arial, sans-serif; font-size: 9.5pt; line-height: 1.45; color: #111;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.tpl-bold h1 { font-family: "Poppins", sans-serif; font-size: 34pt; line-height: .95; font-weight: 700; letter-spacing: -1pt; text-transform: uppercase; }
+.tpl-bold h1 span:last-child { color: #111; }
+.tpl-bold h1 span:first-child { display: block; }
+.tpl-bold .headline { margin-top: 6pt; font-weight: 700; font-size: 11pt; }
+.tpl-bold mark { background: #ffd23f; padding: 0 4pt; }
+.tpl-bold .contact { margin-top: 6pt; color: #555; font-size: 8.5pt; }
+.tpl-bold .summary { margin-top: 10pt; font-size: 10.5pt; color: #333; border-left: 3pt solid #ffd23f; padding-left: 8pt; }
+.tpl-bold section { margin-top: 12pt; }
+.tpl-bold h2 { font-family: "Poppins", sans-serif; font-size: 13pt; font-weight: 700; margin-bottom: 6pt; }
+.tpl-bold h2::after { content: ""; display: block; width: 22mm; height: 3pt; background: #ffd23f; margin-top: 2pt; }
+.tpl-bold .tl { display: grid; grid-template-columns: 32mm 1fr; gap: 0 5mm; margin-bottom: 8pt; break-inside: avoid; }
+.tpl-bold .when { font-size: 8.5pt; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: .5pt; padding-top: 1.5pt; }
+.tpl-bold h3 { font-size: 10.5pt; font-weight: 700; }
+.tpl-bold .at { color: #555; }
+
+@media print { .tpl-mheader { min-height: 296mm; } }

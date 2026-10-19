@@ -4,7 +4,7 @@ import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
   return (
-    <main className="grid min-h-screen place-items-center px-4">
+    <main className="min-h-app grid place-items-center px-4 py-8">
       <div className="w-full max-w-sm">
         <Link href="/" className="font-display mb-8 block text-center text-3xl font-bold">
           CV<span className="text-brand">ku</span>

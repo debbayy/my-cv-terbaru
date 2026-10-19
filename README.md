@@ -2,7 +2,14 @@
 
 Next.js 16 (App Router) · Supabase (auth + DB) · Midtrans (QRIS/e-wallet/VA) · Puppeteer (PDF berbasis teks)
 
-**Model bisnis:** semua template gratis untuk diedit & di-preview (dengan watermark). Download PDF hanya untuk user **Pro — Rp50.000 / 30 hari** (bukan auto-debit; perpanjangan ditambahkan ke sisa masa aktif).
+**Model bisnis:** semua template CV (8) dan kartu ucapan (8) bisa diisi & di-preview **tanpa login**. Saat klik Download → login → (kalau belum Pro) bayar **Pro — Rp50.000 / 30 hari**. Isian tamu disimpan di browser lalu dipindah ke akun otomatis setelah login.
+
+### Alur pengguna
+```
+Pilih template → isi → preview (watermark)      ← tanpa login
+      ↓ klik Download
+Login / daftar → draft dipindah ke akun (/claim) → paywall Pro → bayar Midtrans → download
+```
 
 ---
 
@@ -82,6 +89,12 @@ src/
     cv.ts                    tipe data CV + contoh
 supabase/schema.sql
 ```
+
+## Update database
+Sudah pernah menjalankan `schema.sql` versi lama? Jalankan `supabase/migration-002-cards.sql` di SQL Editor untuk tabel kartu ucapan (atau jalankan ulang `schema.sql` — aman).
+
+## Kartu ucapan
+Desain ada di `src/components/cards/cards.tsx`, gaya di `src/app/cards.css`, daftar & teks contoh di `src/lib/card-templates.ts`. Ukuran kanvas 540×675 px → export PNG 1080×1350 (pas WA/IG) atau PDF. Di HP, tombol Download PNG langsung membuka menu Share.
 
 ## Menambah template
 1. Buat komponen di `src/components/templates/NamaBaru.tsx` (terima `{ data: CvData }`)

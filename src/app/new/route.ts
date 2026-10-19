@@ -9,10 +9,8 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    const next = `/new?template=${templateId}`;
-    return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent(next)}`, req.url));
-  }
+  // Tamu: langsung ke editor tanpa login. Login baru diminta saat download.
+  if (!user) return NextResponse.redirect(new URL(`/draft?template=${templateId}`, req.url));
 
   const { data, error } = await supabase
     .from("cvs")

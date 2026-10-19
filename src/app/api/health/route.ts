@@ -14,7 +14,7 @@ export async function GET() {
     try {
       const db = createAdminClient();
       const checks = await Promise.all(
-        ["profiles", "cvs", "payments"].map(async (t) => {
+        ["profiles", "cvs", "payments", "cards"].map(async (t) => {
           const { error } = await db.from(t).select("*", { head: true, count: "exact" }).limit(1);
           return `${t}: ${error ? "✗ " + error.message : "✓"}`;
         }),

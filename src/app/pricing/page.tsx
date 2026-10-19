@@ -17,23 +17,24 @@ export default async function Pricing() {
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-4xl px-4 py-14">
-        <h1 className="font-display text-center text-4xl font-bold">Harga simpel</h1>
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+        <h1 className="font-display text-center text-3xl font-bold sm:text-4xl">Harga simpel</h1>
         <p className="mt-2 text-center text-muted">Bikin dan edit CV selalu gratis. Bayar hanya saat mau download.</p>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-line bg-white p-7">
+          <div className="rounded-2xl border border-line bg-white p-6 sm:p-7">
             <h2 className="text-lg font-bold">Gratis</h2>
             <p className="font-display mt-2 text-4xl font-bold">Rp0</p>
             <ul className="mt-6 space-y-2 text-sm">
               <li>✓ Semua template</li>
               <li>✓ Editor + preview langsung</li>
               <li>✓ Simpan CV di akun</li>
-              <li className="text-muted">✗ Download PDF</li>
+              <li>✓ Desain kartu ucapan</li>
+              <li className="text-muted">✗ Download CV & kartu</li>
             </ul>
           </div>
 
-          <div className="relative rounded-2xl bg-brand-dark p-7 text-white">
+          <div className="relative rounded-2xl bg-brand-dark p-6 text-white sm:p-7">
             <span className="absolute -top-3 right-6 rounded-full bg-gold px-3 py-1 text-xs font-bold text-ink">PALING DIPILIH</span>
             <h2 className="text-lg font-bold">{plan.name}</h2>
             <p className="font-display mt-2 text-4xl font-bold">
@@ -41,7 +42,8 @@ export default async function Pricing() {
             </p>
             <ul className="mt-6 space-y-2 text-sm">
               <li>✓ Semua fitur Gratis</li>
-              <li>✓ Download PDF tanpa batas & tanpa watermark</li>
+              <li>✓ Download CV (PDF) tanpa batas & tanpa watermark</li>
+              <li>✓ Download kartu ucapan (PNG & PDF)</li>
               <li>✓ PDF berbasis teks, terbaca ATS</li>
               <li>✓ Tidak perpanjang otomatis — bayar lagi kalau perlu</li>
             </ul>

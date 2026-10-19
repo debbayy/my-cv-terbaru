@@ -6,7 +6,7 @@ export const PLANS: Record<PlanId, { id: PlanId; name: string; price: number; da
     name: "Pro 30 Hari",
     price: 50_000,
     days: 30,
-    tagline: "Download PDF tanpa batas selama 30 hari",
+    tagline: "Download CV & kartu ucapan tanpa batas selama 30 hari",
   },
   // Contoh tambah paket sekali pakai:
   // pro_weekly: { id: "pro_weekly", name: "Pro 7 Hari", price: 20_000, days: 7, tagline: "..." },
