@@ -1,3 +1,4 @@
+import LoadingLink from "@/components/ui/LoadingLink";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -42,7 +43,7 @@ export default function KartuGallery() {
             <h2 className="text-xl font-bold">{OCCASIONS[g.o]}</h2>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
               {g.items.map((t) => (
-                <a key={t.id} href={`/kartu/new?template=${t.id}`} className="group block">
+                <LoadingLink key={t.id} href={`/kartu/new?template=${t.id}`} className="group block" overlay>
                   <div className="pointer-events-none overflow-hidden rounded-xl shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-lg">
                     <CardPreview data={t.defaults} templateId={t.id} />
                   </div>
@@ -50,7 +51,7 @@ export default function KartuGallery() {
                     {t.name}
                     {t.tier === "promax" && <span className="ml-1.5 rounded bg-ink px-1.5 py-0.5 align-middle text-[10px] font-bold text-gold">PRO MAX</span>}
                   </p>
-                </a>
+                </LoadingLink>
               ))}
             </div>
           </section>

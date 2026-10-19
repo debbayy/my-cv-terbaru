@@ -1,0 +1,4 @@
+/** Kotak abu berdenyut untuk placeholder saat halaman memuat. */
+export default function Skeleton({ className = "" }: { className?: string }) {
+  return <div aria-hidden className={`animate-pulse rounded-lg bg-line/70 ${className}`} />;
+}

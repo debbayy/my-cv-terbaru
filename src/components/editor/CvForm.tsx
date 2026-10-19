@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/components/ui/Spinner";
 import { useState } from "react";
 import { emptyCv, uid, type Certification, type CvData, type Education, type Experience } from "@/lib/cv";
 import { photoToDataUrl } from "@/lib/photo";
@@ -63,6 +64,7 @@ export default function CvForm({ data, onChange }: Props) {
   const p = data.personal;
   const setP = (patch: Partial<CvData["personal"]>) => onChange({ ...data, personal: { ...p, ...patch } });
   const [photoErr, setPhotoErr] = useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   async function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -70,7 +72,9 @@ export default function CvForm({ data, onChange }: Props) {
     if (!f) return;
     if (!f.type.startsWith("image/")) return setPhotoErr("File harus berupa gambar (JPG/PNG).");
     setPhotoErr(null);
+    setPhotoBusy(true);
     try { setP({ photo: await photoToDataUrl(f) }); } catch { setPhotoErr("Gagal membaca foto. Coba foto lain."); }
+    finally { setPhotoBusy(false); }
   }
 
   const exp = listOps<Experience>(data.experience, (experience) => onChange({ ...data, experience }));
@@ -111,9 +115,10 @@ export default function CvForm({ data, onChange }: Props) {
             {p.photo ? <img src={p.photo} alt="Pas foto" className="h-full w-full object-cover" /> : "Foto"}
           </div>
           <div className="min-w-0 text-sm">
-            <label className="btn-ghost cursor-pointer py-1.5">
-              {p.photo ? "Ganti foto" : "Upload pas foto"}
-              <input type="file" accept="image/*" className="hidden" onChange={pickPhoto} />
+            <label className={`btn-ghost cursor-pointer py-1.5 ${photoBusy ? "pointer-events-none opacity-60" : ""}`} aria-busy={photoBusy}>
+              {photoBusy && <Spinner className="h-3.5 w-3.5" />}
+              {photoBusy ? "Memproses foto…" : p.photo ? "Ganti foto" : "Upload pas foto"}
+              <input type="file" accept="image/*" disabled={photoBusy} className="hidden" onChange={pickPhoto} />
             </label>
             {p.photo && <button type="button" className="ml-2 text-xs text-red-600" onClick={() => setP({ photo: undefined })}>Hapus</button>}
             <p className="mt-1 text-[11px] text-muted">Tampil di template desain bebas. Untuk lamaran via ATS sebaiknya tanpa foto.</p>

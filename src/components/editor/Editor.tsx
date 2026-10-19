@@ -9,6 +9,7 @@ import type { CvData } from "@/lib/cv";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
 import { canDownload, showAds, type Access } from "@/lib/access";
 import AdSlot from "@/components/ads/AdSlot";
+import Spinner from "@/components/ui/Spinner";
 import { PLANS, rupiah } from "@/lib/plans";
 import CvForm from "./CvForm";
 import CvPreview from "./CvPreview";
@@ -35,6 +36,8 @@ export default function Editor({
   const [save, setSave] = useState<SaveState>("saved");
   const [tab, setTab] = useState<"form" | "preview">("form");
   const [downloading, setDownloading] = useState(false);
+  const [navigating, setNavigating] = useState(false); // sedang pindah ke login/bayar
+  const go = (url: string) => { setNavigating(true); router.push(url); };
   const [paywall, setPaywall] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,21 +87,23 @@ export default function Editor({
   }, [save]);
 
   async function download(opts?: { auto?: boolean }) {
+    if (downloading || navigating) return; // cegah klik berulang
     setError(null);
     // Tamu: simpan draft, lalu minta login. Setelah login, /claim memindahkan draft ke akun
     // dan membuka editor lagi dengan ?download=1 supaya alurnya langsung lanjut.
     if (guest || !id) {
       await persist();
       const { data: { user } } = await supabase.auth.getUser();
-      router.push(user ? "/claim" : "/login?next=/claim&reason=download");
+      go(user ? "/claim" : "/login?next=/claim&reason=download");
       return;
     }
     // Akun gratis + CV ATS: konfirmasi pakai jatah 1x
     if (free && !opts?.auto && !window.confirm("Download gratis hanya 1x. Pastikan CV kamu sudah final. Lanjut download?")) return;
     // Belum Pro (dan bukan jatah gratis) → langsung ke halaman bayar QRIS, setelah lunas kembali & download otomatis
     if (!pro && !free) {
+      setNavigating(true);
       await persist();
-      router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
+      go(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
       return;
     }
     setDownloading(true);
@@ -107,7 +112,7 @@ export default function Editor({
       const res = await fetch(`/api/cv/${id}/pdf`);
       if (res.status === 402) {
         setFreeLeft(0);
-        router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
+        go(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
         return;
       }
       if (!res.ok) throw new Error("Gagal membuat PDF. Coba lagi sebentar.");
@@ -144,11 +149,12 @@ export default function Editor({
               <option key={t.id} value={t.id}>{t.name}{t.ats ? " (ATS)" : ""}{t.tier === "promax" ? " ★ Pro Max" : ""}</option>
             ))}
           </select>
-          <button onClick={() => download()} disabled={downloading} className="btn-primary shrink-0">
-            {downloading ? "Membuat PDF…" : free ? "Download Gratis" : "Download PDF"}
-            {free ? (
+          <button onClick={() => download()} disabled={downloading || navigating} aria-busy={downloading || navigating} className="btn-primary shrink-0">
+            {(downloading || navigating) && <Spinner />}
+            {downloading ? "Membuat PDF…" : navigating ? "Membuka…" : free ? "Download Gratis" : "Download PDF"}
+            {downloading || navigating ? null : free ? (
               <span className="rounded bg-white/25 px-1.5 text-[10px] font-bold">1x</span>
-            ) : !pro && !guest && !(guest && isAts) ? (
+            ) : !pro && !guest && !(guest && isAts) && !downloading && !navigating ? (
               <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">{tier === "promax" ? "PRO MAX" : "PRO"}</span>
             ) : null}
           </button>

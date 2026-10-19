@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/components/ui/Spinner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,6 +29,8 @@ export default function CardEditor({
   const [data, setData] = useState(initialData);
   const [saved, setSaved] = useState(true);
   const [busy, setBusy] = useState<Format | null>(null);
+  const [navigating, setNavigating] = useState(false);
+  const go = (url: string) => { setNavigating(true); router.push(url); };
   const [paywall, setPaywall] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,17 +57,19 @@ export default function CardEditor({
   }, [templateId, data, persist]);
 
   async function download(format: Format) {
+    if (busy || navigating) return;
     setError(null);
     if (guest || !id) {
       await persist();
       const { data: { user } } = await supabase.auth.getUser();
       const next = `/kartu/claim?format=${format}`;
-      router.push(user ? next : `/login?next=${encodeURIComponent(next)}&reason=download`);
+      go(user ? next : `/login?next=${encodeURIComponent(next)}&reason=download`);
       return;
     }
     if (!pro) {
+      setNavigating(true);
       await persist();
-      router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
+      go(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
       return;
     }
     setBusy(format);
@@ -72,7 +77,7 @@ export default function CardEditor({
       if (!saved && !(await persist())) throw new Error("Gagal menyimpan perubahan terakhir.");
       const res = await fetch(`/api/card/${id}/export?format=${format}`);
       if (res.status === 402) {
-        router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
+        go(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
         return;
       }
       if (!res.ok) throw new Error("Gagal membuat file. Coba lagi sebentar.");
@@ -117,10 +122,12 @@ export default function CardEditor({
           <p className="min-w-0 flex-1 truncate font-semibold">{current.name}</p>
           <span className="hidden text-xs text-muted sm:inline">{saved ? "Tersimpan" : "Menyimpan…"}</span>
           <div className="h-0 basis-full sm:hidden" aria-hidden />
-          <button onClick={() => download("png")} disabled={!!busy} className="btn-primary flex-1 sm:flex-none">
-            {busy === "png" ? "Membuat…" : "Download PNG"}
+          <button onClick={() => download("png")} disabled={!!busy || navigating} aria-busy={busy === "png"} className="btn-primary flex-1 sm:flex-none">
+            {(busy === "png" || navigating) && <Spinner />}
+            {busy === "png" ? "Membuat…" : navigating ? "Membuka…" : "Download PNG"}
           </button>
-          <button onClick={() => download("pdf")} disabled={!!busy} className="btn-ghost">
+          <button onClick={() => download("pdf")} disabled={!!busy || navigating} aria-busy={busy === "pdf"} className="btn-ghost">
+            {busy === "pdf" && <Spinner />}
             {busy === "pdf" ? "Membuat…" : "PDF"}
           </button>
         </header>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import PendingLink from "@/components/ui/PendingLink";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/server";
@@ -61,9 +61,9 @@ export default async function Pricing() {
               <li>✓ Download tanpa batas jumlah</li>
               <li>✓ <strong>Tanpa iklan</strong></li>
             </ul>
-            <Link href={href(pro.id)} className="btn-primary mt-7 w-full py-3 text-base">
+            <PendingLink href={href(pro.id)} className="btn-primary mt-7 w-full py-3 text-base">
               {access.pro && !access.promax ? "Perpanjang Pro" : "Pilih Pro"}
-            </Link>
+            </PendingLink>
             {access.pro && !access.promax && access.proUntil && (
               <p className="mt-3 text-center text-xs text-muted">Pro aktif sampai {fmt(access.proUntil)}</p>
             )}
@@ -83,9 +83,9 @@ export default async function Pricing() {
               <li>✓ Template baru otomatis ikut terbuka</li>
               <li>✓ <strong>Tanpa iklan</strong> · semua fitur Pro</li>
             </ul>
-            <Link href={href(max.id)} className="btn-gold mt-7 w-full py-3 text-base">
+            <PendingLink href={href(max.id)} className="btn-gold mt-7 w-full py-3 text-base">
               {access.promax ? "Perpanjang Pro Max" : "Pilih Pro Max"}
-            </Link>
+            </PendingLink>
             {access.promax && access.promaxUntil && (
               <p className="mt-3 text-center text-xs text-white/70">Pro Max aktif sampai {fmt(access.promaxUntil)}</p>
             )}

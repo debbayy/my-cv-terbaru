@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/components/ui/Spinner";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -142,18 +143,22 @@ export default function Bayar({
               <p className="text-sm text-muted">Pro aktif. Mengunduh file kamu…</p>
             </div>
           ) : phase === "creating" ? (
-            <div className="py-16 text-sm text-muted">Menyiapkan QRIS…</div>
+            <div className="flex flex-col items-center gap-3 py-16 text-sm text-muted"><Spinner className="h-8 w-8 text-brand" />Menyiapkan QRIS…</div>
           ) : phase === "expired" ? (
             <div className="py-8">
               <p className="font-semibold">QR sudah kedaluwarsa</p>
               <button onClick={() => charge("qris")} disabled={!!busy} className="btn-primary mt-4">
+                {busy && <Spinner />}
                 {busy ? "Membuat…" : "Buat QR baru"}
               </button>
             </div>
           ) : phase === "error" ? (
             <div className="py-6">
               <p className="text-sm text-red-700">{err}</p>
-              <button onClick={() => charge("qris")} disabled={!!busy} className="btn-primary mt-4">Coba lagi</button>
+              <button onClick={() => charge("qris")} disabled={!!busy} className="btn-primary mt-4">
+                {busy && <Spinner />}
+                {busy ? "Memproses…" : "Coba lagi"}
+              </button>
             </div>
           ) : qr ? (
             <>
@@ -175,6 +180,7 @@ export default function Bayar({
             </>
           ) : (
             <div className="py-10 text-sm text-muted">
+              <Spinner className="mx-auto mb-3 h-8 w-8 text-brand" />
               Menunggu konfirmasi pembayaran…
               <p className="mt-2 flex items-center justify-center gap-2 text-xs text-brand">
                 <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-brand" /> Halaman ini otomatis lanjut setelah lunas
@@ -187,10 +193,12 @@ export default function Bayar({
           <div className="mt-5 space-y-2 border-t border-line pt-5">
             {mobile && (
               <button onClick={() => charge("gopay")} disabled={!!busy} className="btn-ghost w-full">
+                {busy === "gopay" && <Spinner />}
                 {busy === "gopay" ? "Membuka GoPay…" : "Bayar langsung di aplikasi GoPay"}
               </button>
             )}
             <button onClick={() => charge("snap")} disabled={!!busy} className="btn-ghost w-full">
+              {busy === "snap" && <Spinner />}
               {busy === "snap" ? "Membuka…" : "Metode lain (Transfer bank / VA, kartu)"}
             </button>
           </div>

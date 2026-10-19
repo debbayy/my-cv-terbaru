@@ -6,6 +6,9 @@ import { getTemplate, TEMPLATES } from "@/lib/templates";
 import { rupiah } from "@/lib/plans";
 import { getAccess, showAds } from "@/lib/access";
 import AdSlot from "@/components/ads/AdSlot";
+import SubmitButton from "@/components/ui/SubmitButton";
+import SignOutButton from "@/components/ui/SignOutButton";
+import LoadingLink from "@/components/ui/LoadingLink";
 import { deleteCard, deleteCv, duplicateCv } from "./actions";
 import { getCardTemplate } from "@/lib/card-templates";
 import { OCCASIONS } from "@/lib/card";
@@ -55,9 +58,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               )}
             </p>
           </div>
-          <form action="/auth/signout" method="post">
-            <button className="text-sm text-muted hover:text-ink">Keluar</button>
-          </form>
+          <SignOutButton className="text-sm text-muted hover:text-ink" />
         </div>
 
         {showAds(access) && <AdSlot placement="dashboard" className="mb-8" />}
@@ -65,9 +66,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Mulai CV baru</h2>
         <div className="mb-10 flex flex-wrap gap-2 sm:gap-3">
           {TEMPLATES.map((t) => (
-            <a key={t.id} href={`/new?template=${t.id}`} className="btn-ghost">
+            <LoadingLink key={t.id} href={`/new?template=${t.id}`} className="btn-ghost">
               + {t.name}
-            </a>
+            </LoadingLink>
           ))}
         </div>
 
@@ -87,11 +88,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                 <Link href={`/editor/${cv.id}`} className="btn-ghost hidden py-1.5 sm:inline-flex">Edit</Link>
                 <form action={duplicateCv}>
                   <input type="hidden" name="id" value={cv.id} />
-                  <button className="text-sm text-muted hover:text-ink hover:underline" title="Bikin versi lain untuk lowongan berbeda">Duplikat</button>
+                  <SubmitButton pendingText="Menyalin…" className="text-sm text-muted hover:text-ink hover:underline" title="Bikin versi lain untuk lowongan berbeda">Duplikat</SubmitButton>
                 </form>
                 <form action={deleteCv}>
                   <input type="hidden" name="id" value={cv.id} />
-                  <button className="text-sm text-red-600 hover:underline">Hapus</button>
+                  <SubmitButton pendingText="Menghapus…" confirm="Hapus permanen? Tindakan ini tidak bisa dibatalkan." className="text-sm text-red-600 hover:underline">Hapus</SubmitButton>
                 </form>
               </li>
             ))}
@@ -119,7 +120,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                   <Link href={`/kartu/${c.id}`} className="btn-ghost hidden py-1.5 sm:inline-flex">Edit</Link>
                   <form action={deleteCard}>
                     <input type="hidden" name="id" value={c.id} />
-                    <button className="text-sm text-red-600 hover:underline">Hapus</button>
+                    <SubmitButton pendingText="Menghapus…" confirm="Hapus permanen? Tindakan ini tidak bisa dibatalkan." className="text-sm text-red-600 hover:underline">Hapus</SubmitButton>
                   </form>
                 </li>
               );

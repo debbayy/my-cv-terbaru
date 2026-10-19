@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/config";
 import { useRouter, useSearchParams } from "next/navigation";
+import Spinner from "@/components/ui/Spinner";
 import { createClient } from "@/lib/supabase/client";
 
 /** Ubah ke true kalau login Google sudah siap (Supabase → Providers → Google). */
@@ -151,14 +152,15 @@ export default function LoginForm() {
             {msg.text}
           </p>
         )}
-        <button disabled={loading} className="btn-primary w-full py-2.5">
+        <button disabled={loading} aria-busy={loading} className="btn-primary w-full py-2.5">
+          {loading && <Spinner />}
           {loading ? "Memproses…" : mode === "login" ? "Masuk" : "Daftar"}
         </button>
       </form>
 
       <p className="mt-4 text-center text-sm text-muted">
         {mode === "login" ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
-        <button className="font-semibold text-brand" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMsg(null); }}>
+        <button disabled={loading} className="font-semibold text-brand disabled:opacity-50" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMsg(null); }}>
           {mode === "login" ? "Daftar" : "Masuk"}
         </button>
       </p>

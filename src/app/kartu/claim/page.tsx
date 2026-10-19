@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/components/ui/Spinner";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -46,7 +47,7 @@ function Claim() {
       <button onClick={() => location.reload()} className="btn-primary mt-4">Coba lagi</button>
     </div>
   ) : (
-    <p className="text-muted">Menyiapkan download…</p>
+    <p className="flex items-center gap-2 text-muted"><Spinner className="h-5 w-5 text-brand" />Menyiapkan download…</p>
   );
 }
 

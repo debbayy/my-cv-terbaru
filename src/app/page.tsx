@@ -1,3 +1,4 @@
+import LoadingLink from "@/components/ui/LoadingLink";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Ad from "@/components/ads/Ad";
@@ -30,7 +31,7 @@ export default function Home() {
               Banyak CV gugur sebelum dibaca HRD karena formatnya nggak bisa dibaca mesin. Isi datamu, pilih template, download PDF berbasis teks yang lolos screening.
             </p>
             <div className="mt-7 grid gap-3 min-[420px]:flex min-[420px]:flex-wrap">
-              <a href="/new?template=ats-classic" className="btn-primary px-6 py-3 text-base">Buat CV Gratis</a>
+              <LoadingLink href="/new?template=ats-classic" className="btn-primary px-6 py-3 text-base">Buat CV Gratis</LoadingLink>
               <Link href="#template" className="btn-ghost px-6 py-3 text-base">Lihat Template</Link>
             </div>
           </div>
@@ -70,7 +71,7 @@ export default function Home() {
               <p className="text-sm text-muted">{g.desc}</p>
               <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 lg:gap-8">
                 {g.items.map((t) => (
-                  <a key={t.id} href={`/new?template=${t.id}`} className="group block">
+                  <LoadingLink key={t.id} href={`/new?template=${t.id}`} className="group block" overlay>
                     <div className="overflow-hidden rounded-xl border border-line bg-white p-2 transition group-hover:-translate-y-1 group-hover:shadow-lg sm:p-4">
                       <div className="pointer-events-none max-h-[230px] overflow-hidden sm:max-h-[360px]">
                         <CvPreview data={sample} templateId={t.id} />
@@ -84,7 +85,7 @@ export default function Home() {
                       <span className="hidden text-sm font-semibold text-brand opacity-0 transition group-hover:opacity-100 lg:inline">Pakai →</span>
                     </div>
                     <p className="hidden text-sm text-muted sm:block">{t.description}</p>
-                  </a>
+                  </LoadingLink>
                 ))}
               </div>
             </div>
@@ -104,9 +105,9 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-4 gap-2 sm:gap-3">
               {CARD_TEMPLATES.slice(0, 8).map((t) => (
-                <a key={t.id} href={`/kartu/new?template=${t.id}`} className="pointer-events-auto block overflow-hidden rounded-lg shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                <LoadingLink key={t.id} href={`/kartu/new?template=${t.id}`} className="pointer-events-auto block overflow-hidden rounded-lg shadow-sm transition hover:-translate-y-1 hover:shadow-md" overlay>
                   <div className="pointer-events-none"><CardPreview data={t.defaults} templateId={t.id} /></div>
-                </a>
+                </LoadingLink>
               ))}
             </div>
           </div>
