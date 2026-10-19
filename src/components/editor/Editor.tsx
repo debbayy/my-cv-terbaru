@@ -86,7 +86,12 @@ export default function Editor({
       router.push(user ? "/claim" : "/login?next=/claim&reason=download");
       return;
     }
-    if (!pro) { setPaywall(true); return; }
+    // Belum Pro → langsung ke halaman bayar QRIS, setelah lunas kembali & download otomatis
+    if (!pro) {
+      await persist();
+      router.push(`/bayar?next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
+      return;
+    }
     setDownloading(true);
     try {
       if (save !== "saved" && !(await persist())) throw new Error("Gagal menyimpan perubahan terakhir.");
@@ -186,8 +191,8 @@ export default function Editor({
               <li>✓ Simpan & edit banyak versi CV</li>
             </ul>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-3">
-              <Link href={`/pricing?from=${id ?? ""}`} className="btn-primary flex-1 py-3">
-                Upgrade {rupiah(PLANS.pro_monthly.price)} / 30 hari
+              <Link href={`/bayar?next=${encodeURIComponent(`/editor/${id}?download=1`)}`} className="btn-primary flex-1 py-3">
+                Bayar {rupiah(PLANS.pro_monthly.price)} via QRIS
               </Link>
               <button onClick={() => setPaywall(false)} className="btn-ghost">Nanti</button>
             </div>

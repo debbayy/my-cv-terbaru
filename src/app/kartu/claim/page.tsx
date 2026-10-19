@@ -30,7 +30,11 @@ function Claim() {
         return;
       }
       clearCardDraft();
-      router.replace(`/kartu/${data.id}?download=${format}`);
+      const after = `/kartu/${data.id}?download=${format}`;
+      const { data: prof } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
+      const pro = !!prof?.pro_until && new Date(prof.pro_until).getTime() > Date.now();
+      // Belum Pro → langsung ke halaman bayar QRIS; setelah lunas otomatis kembali & download
+      router.replace(pro ? after : `/bayar?next=${encodeURIComponent(after)}`);
     })();
   }, [router, format]);
 
@@ -40,7 +44,7 @@ function Claim() {
       <button onClick={() => location.reload()} className="btn-primary mt-4">Coba lagi</button>
     </div>
   ) : (
-    <p className="text-muted">Menyimpan kartu ke akun kamu…</p>
+    <p className="text-muted">Menyiapkan download…</p>
   );
 }
 

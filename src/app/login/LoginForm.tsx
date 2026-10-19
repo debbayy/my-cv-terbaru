@@ -33,6 +33,31 @@ export default function LoginForm() {
   };
 
   const callback = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+  // Link verifikasi email kembali ke halaman login ini (bukan localhost), membawa tujuan berikutnya
+  const verifyRedirect = () => {
+    const q = new URLSearchParams({ verified: "1", next });
+    if (params.get("reason")) q.set("reason", params.get("reason")!);
+    return `${window.location.origin}/login?${q}`;
+  };
+
+  // Dibuka dari link verifikasi email
+  useEffect(() => {
+    if (params.get("verified") !== "1") return;
+    const code = params.get("code");
+    (async () => {
+      if (code) {
+        // Browser yang sama → langsung masuk tanpa ketik password lagi
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) {
+          router.replace(next);
+          router.refresh();
+          return;
+        }
+      }
+      setMsg({ type: "info", text: "✅ Email kamu sudah terverifikasi. Silakan masuk." });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,13 +74,16 @@ export default function LoginForm() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: callback() },
+        options: { emailRedirectTo: verifyRedirect() },
       });
       if (error) setMsg({ type: "error", text: explain(error.message) });
       else if (data.session) {
         router.replace(next);
         router.refresh();
-      } else setMsg({ type: "info", text: "Cek email kamu untuk konfirmasi akun, lalu masuk." });
+      } else {
+        setMode("login");
+        setMsg({ type: "info", text: `Link verifikasi sudah dikirim ke ${email}. Buka email (cek juga folder Spam), klik link-nya, lalu kamu otomatis kembali ke sini.` });
+      }
     }
     setLoading(false);
   }

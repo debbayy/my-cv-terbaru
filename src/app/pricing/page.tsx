@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { isPro, PLANS, rupiah } from "@/lib/plans";
-import CheckoutButton from "./CheckoutButton";
+import Link from "next/link";
 
 export default async function Pricing() {
   const supabase = await createClient();
@@ -48,18 +48,16 @@ export default async function Pricing() {
               <li>✓ Tidak perpanjang otomatis — bayar lagi kalau perlu</li>
             </ul>
             <div className="mt-7">
-              <CheckoutButton
-                plan={plan.id}
-                loggedIn={!!user}
-                label={pro ? "Perpanjang 30 hari lagi" : "Upgrade ke Pro"}
-              />
+              <Link href={user ? "/bayar?next=/dashboard" : "/login?next=%2Fbayar%3Fnext%3D%252Fdashboard"} className="btn-gold w-full py-3 text-base">
+                {pro ? "Perpanjang 30 hari lagi" : "Upgrade ke Pro"}
+              </Link>
             </div>
             {pro && proUntil && (
               <p className="mt-3 text-center text-xs text-white/70">
                 Pro aktif sampai {new Date(proUntil).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}. Perpanjangan ditambahkan ke sisa masa aktif.
               </p>
             )}
-            <p className="mt-3 text-center text-xs text-white/60">QRIS · GoPay · ShopeePay · Virtual Account · Kartu</p>
+            <p className="mt-3 text-center text-xs text-white/60">QRIS (semua e-wallet & m-banking) · GoPay · Virtual Account · Kartu</p>
           </div>
         </div>
       </main>

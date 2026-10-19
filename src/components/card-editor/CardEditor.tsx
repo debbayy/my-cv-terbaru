@@ -58,7 +58,11 @@ export default function CardEditor({
       router.push(user ? next : `/login?next=${encodeURIComponent(next)}&reason=download`);
       return;
     }
-    if (!pro) { setPaywall(true); return; }
+    if (!pro) {
+      await persist();
+      router.push(`/bayar?next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
+      return;
+    }
     setBusy(format);
     try {
       if (!saved && !(await persist())) throw new Error("Gagal menyimpan perubahan terakhir.");
@@ -187,8 +191,8 @@ export default function CardEditor({
             <h2 className="font-display text-2xl font-bold">Kartumu sudah cantik 💌</h2>
             <p className="mt-2 text-muted">Upgrade ke Pro untuk download kartu & CV tanpa watermark, sepuasnya.</p>
             <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-3">
-              <Link href="/pricing" className="btn-primary flex-1 py-3">
-                Upgrade {rupiah(PLANS.pro_monthly.price)} / 30 hari
+              <Link href={`/bayar?next=${encodeURIComponent(`/kartu/${id}?download=png`)}`} className="btn-primary flex-1 py-3">
+                Bayar {rupiah(PLANS.pro_monthly.price)} via QRIS
               </Link>
               <button onClick={() => setPaywall(false)} className="btn-ghost">Nanti</button>
             </div>

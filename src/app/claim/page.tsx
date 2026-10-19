@@ -32,7 +32,11 @@ export default function ClaimPage() {
         return;
       }
       clearDraft();
-      router.replace(`/editor/${data.id}?download=1`);
+      const after = `/editor/${data.id}?download=1`;
+      const { data: prof } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
+      const pro = !!prof?.pro_until && new Date(prof.pro_until).getTime() > Date.now();
+      // Belum Pro → langsung ke halaman bayar QRIS; setelah lunas otomatis kembali & download
+      router.replace(pro ? after : `/bayar?next=${encodeURIComponent(after)}`);
     })();
   }, [router]);
 
@@ -44,7 +48,7 @@ export default function ClaimPage() {
           <button onClick={() => location.reload()} className="btn-primary mt-4">Coba lagi</button>
         </div>
       ) : (
-        <p className="text-muted">Menyimpan CV ke akun kamu…</p>
+        <p className="text-muted">Menyiapkan download…</p>
       )}
     </main>
   );
