@@ -6,6 +6,12 @@ const PROTECTED = ["/dashboard", "/editor"];
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  // Env Supabase belum di-set → jangan crash seluruh situs, biarkan halaman tampil pesan error
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.error("[proxy] NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY belum di-set");
+    return response;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,7 +27,7 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
   const path = request.nextUrl.pathname;
 
   if (!data.user && PROTECTED.some((p) => path.startsWith(p))) {
