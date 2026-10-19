@@ -74,7 +74,10 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between gap-2">
-                      <h4 className="text-sm font-semibold sm:text-base">{t.name}</h4>
+                      <h4 className="text-sm font-semibold sm:text-base">
+                        {t.name}
+                        {t.tier === "promax" && <span className="ml-1.5 rounded bg-ink px-1.5 py-0.5 align-middle text-[10px] font-bold text-gold">PRO MAX</span>}
+                      </h4>
                       <span className="hidden text-sm font-semibold text-brand opacity-0 transition group-hover:opacity-100 lg:inline">Pakai →</span>
                     </div>
                     <p className="hidden text-sm text-muted sm:block">{t.description}</p>

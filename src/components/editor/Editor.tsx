@@ -6,7 +6,8 @@ import { saveDraft } from "@/lib/draft";
 import { saveBlob } from "@/lib/save-blob";
 import { createClient } from "@/lib/supabase/client";
 import type { CvData } from "@/lib/cv";
-import { TEMPLATES } from "@/lib/templates";
+import { TEMPLATES, getTemplate } from "@/lib/templates";
+import { canDownload, type Access } from "@/lib/access";
 import { PLANS, rupiah } from "@/lib/plans";
 import CvForm from "./CvForm";
 import CvPreview from "./CvPreview";
@@ -14,16 +15,18 @@ import CvPreview from "./CvPreview";
 type SaveState = "saved" | "saving" | "dirty" | "error";
 
 export default function Editor({
-  id, initialTitle, initialTemplate, initialData, pro, guest = false, autoDownload = false,
+  id, initialTitle, initialTemplate, initialData, access, guest = false, autoDownload = false,
 }: {
   /** null = mode tamu (draft di browser, belum login) */
-  id: string | null; initialTitle: string; initialTemplate: string; initialData: CvData; pro: boolean;
+  id: string | null; initialTitle: string; initialTemplate: string; initialData: CvData; access: Access;
   guest?: boolean; autoDownload?: boolean;
 }) {
   const supabase = useRef(createClient()).current;
   const router = useRouter();
   const [title, setTitle] = useState(initialTitle);
   const [templateId, setTemplateId] = useState(initialTemplate);
+  const tier = getTemplate(templateId).tier;
+  const pro = canDownload(tier, access); // boleh download template ini?
   const [data, setData] = useState(initialData);
   const [save, setSave] = useState<SaveState>("saved");
   const [tab, setTab] = useState<"form" | "preview">("form");
@@ -89,7 +92,7 @@ export default function Editor({
     // Belum Pro → langsung ke halaman bayar QRIS, setelah lunas kembali & download otomatis
     if (!pro) {
       await persist();
-      router.push(`/bayar?next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
+      router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
       return;
     }
     setDownloading(true);
@@ -127,12 +130,12 @@ export default function Editor({
           <div className="h-0 basis-full sm:hidden" aria-hidden />
           <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="input min-w-0 flex-1 py-1.5 sm:w-auto sm:flex-none" aria-label="Template">
             {TEMPLATES.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}{t.ats ? " (ATS)" : ""}</option>
+              <option key={t.id} value={t.id}>{t.name}{t.ats ? " (ATS)" : ""}{t.tier === "promax" ? " ★ Pro Max" : ""}</option>
             ))}
           </select>
           <button onClick={download} disabled={downloading} className="btn-primary shrink-0">
             {downloading ? "Membuat PDF…" : "Download PDF"}
-            {!pro && !guest && <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">PRO</span>}
+            {!pro && !guest && <span className="rounded bg-gold px-1.5 text-[10px] font-bold text-ink">{tier === "promax" ? "PRO MAX" : "PRO"}</span>}
           </button>
         </header>
 
@@ -166,7 +169,7 @@ export default function Editor({
               <CvPreview data={data} templateId={templateId} watermark={!pro} />
               {!pro && (
                 <p className="mt-3 text-center text-xs text-muted">
-                  Watermark hanya ada di preview. PDF versi Pro bersih & teksnya terbaca ATS.
+                  Watermark hanya ada di preview. {tier === "promax" ? "Template ini termasuk koleksi Pro Max." : "PDF versi Pro bersih & teksnya terbaca ATS."}
                 </p>
               )}
             </div>

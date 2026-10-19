@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeCard } from "@/lib/card";
 import { getCardTemplate } from "@/lib/card-templates";
-import { isPro } from "@/lib/plans";
+import { getAccess } from "@/lib/access";
 import CardEditor from "@/components/card-editor/CardEditor";
 
 export default async function KartuEditorPage({
@@ -16,9 +16,9 @@ export default async function KartuEditorPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/kartu/${id}`);
 
-  const [{ data: card }, { data: profile }] = await Promise.all([
+  const [{ data: card }, access] = await Promise.all([
     supabase.from("cards").select("id,template_id,data").eq("id", id).single(),
-    supabase.from("profiles").select("pro_until").eq("id", user.id).single(),
+    getAccess(supabase, user.id),
   ]);
   if (!card) notFound();
   const t = getCardTemplate(card.template_id);
@@ -28,7 +28,7 @@ export default async function KartuEditorPage({
       id={card.id}
       initialTemplate={t.id}
       initialData={normalizeCard(card.data, t.defaults)}
-      pro={isPro(profile?.pro_until)}
+      access={access}
       autoDownload={download === "png" || download === "pdf" ? download : null}
     />
   );

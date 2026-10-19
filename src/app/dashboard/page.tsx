@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { getTemplate, TEMPLATES } from "@/lib/templates";
-import { isPro, rupiah } from "@/lib/plans";
+import { rupiah } from "@/lib/plans";
+import { getAccess } from "@/lib/access";
 import { deleteCard, deleteCv } from "./actions";
 import { getCardTemplate } from "@/lib/card-templates";
 import { OCCASIONS } from "@/lib/card";
@@ -14,13 +15,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: cvs }, { data: profile }, { data: cards }, { data: pays }] = await Promise.all([
+  const [{ data: cvs }, access, { data: cards }, { data: pays }] = await Promise.all([
     supabase.from("cvs").select("id,title,template_id,updated_at").order("updated_at", { ascending: false }),
-    supabase.from("profiles").select("pro_until").eq("id", user.id).single(),
+    getAccess(supabase, user.id),
     supabase.from("cards").select("id,title,template_id,updated_at").order("updated_at", { ascending: false }),
     supabase.from("payments").select("order_id,amount,status,paid_at,created_at").eq("status", "paid").order("created_at", { ascending: false }).limit(10),
   ]);
-  const pro = isPro(profile?.pro_until);
+  const pro = access.pro;
   const fmt = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
   return (
@@ -40,7 +41,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             <h1 className="font-display text-3xl font-bold">CV Saya</h1>
             <p className="text-sm text-muted">
               {pro ? (
-                <>Pro aktif sampai <strong>{fmt(profile!.pro_until!)}</strong></>
+                access.promax ? (
+                  <>Pro Max aktif sampai <strong>{fmt(access.promaxUntil!)}</strong> — semua template terbuka</>
+                ) : (
+                  <>Pro aktif sampai <strong>{fmt(access.proUntil!)}</strong> · <Link href="/pricing" className="font-semibold text-brand">Upgrade ke Pro Max</Link> untuk semua template</>
+                )
               ) : (
                 <>Akun gratis · <Link href="/pricing" className="font-semibold text-brand">Upgrade ke Pro</Link> untuk download PDF</>
               )}
@@ -118,7 +123,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               {pays.map((p) => (
                 <li key={p.order_id} className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4">
                   <div className="min-w-0">
-                    <p className="font-semibold">Pro 30 Hari · {rupiah(p.amount)}</p>
+                    <p className="font-semibold">{p.amount >= 99_000 ? "Pro Max" : "Pro"} 30 Hari · {rupiah(p.amount)}</p>
                     <p className="truncate font-mono text-xs text-muted">{p.order_id}</p>
                   </div>
                   <span className="shrink-0 text-xs text-muted">{fmt(p.paid_at ?? p.created_at)}</span>

@@ -28,6 +28,7 @@ export default async function Admin() {
     db.from("cards").select("id", { count: "exact", head: true }),
     db.from("profiles").select("id").gt("pro_until", new Date().toISOString()),
   ]);
+  const { data: maxes } = await db.from("profiles").select("id").gt("promax_until", new Date().toISOString());
   const list = (pays ?? []) as Pay[];
   const paid = list.filter((p) => p.status === "paid");
   const total = paid.reduce((s, p) => s + p.amount, 0);
@@ -45,7 +46,7 @@ export default async function Admin() {
     ["Pendapatan total", rupiah(total), `${paid.length} transaksi lunas`],
     ["30 hari terakhir", rupiah(last30.reduce((s, p) => s + p.amount, 0)), `${last30.length} transaksi`],
     ["Hari ini", rupiah(todayPaid.reduce((s, p) => s + p.amount, 0)), `${todayPaid.length} transaksi`],
-    ["Pengguna Pro aktif", String(pros?.length ?? 0), `dari ${users ?? 0} pengguna`],
+    ["Pro / Pro Max aktif", `${pros?.length ?? 0} / ${maxes?.length ?? 0}`, `dari ${users ?? 0} pengguna`],
     ["CV dibuat", String(cvs ?? 0), "tersimpan di akun"],
     ["Kartu dibuat", String(cards ?? 0), "tersimpan di akun"],
   ];
@@ -87,7 +88,7 @@ export default async function Admin() {
                 <tr key={p.order_id}>
                   <td className="whitespace-nowrap px-3 py-2">{fmt(p.paid_at ?? p.created_at)}</td>
                   <td className="px-3 py-2">{emailOf.get(p.user_id)}</td>
-                  <td className="px-3 py-2 font-mono text-xs">{p.order_id}</td>
+                  <td className="px-3 py-2 font-mono text-xs">{p.order_id}<span className="ml-2 font-sans text-muted">{p.plan.startsWith("promax") ? "Pro Max" : "Pro"}</span></td>
                   <td className="px-3 py-2 text-right">{rupiah(p.amount)}</td>
                   <td className="px-3 py-2"><span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge[p.status] ?? ""}`}>{p.status}</span></td>
                 </tr>

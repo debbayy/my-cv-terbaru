@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { canDownload, getAccess } from "@/lib/access";
+import { getTemplate } from "@/lib/templates";
 import { clearDraft, loadDraft } from "@/lib/draft";
 
 /** Setelah login: pindahkan draft tamu ke akun, lalu lanjutkan download. */
@@ -33,10 +35,10 @@ export default function ClaimPage() {
       }
       clearDraft();
       const after = `/editor/${data.id}?download=1`;
-      const { data: prof } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
-      const pro = !!prof?.pro_until && new Date(prof.pro_until).getTime() > Date.now();
+      const tier = getTemplate(draft.templateId).tier;
+      const pro = canDownload(tier, await getAccess(supabase, user.id));
       // Belum Pro → langsung ke halaman bayar QRIS; setelah lunas otomatis kembali & download
-      router.replace(pro ? after : `/bayar?next=${encodeURIComponent(after)}`);
+      router.replace(pro ? after : `/bayar?need=${tier}&next=${encodeURIComponent(after)}`);
     })();
   }, [router]);
 

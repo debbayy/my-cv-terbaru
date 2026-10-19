@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { OCCASIONS, type CardData } from "@/lib/card";
 import { CARD_TEMPLATES, getCardTemplate } from "@/lib/card-templates";
 import { saveCardDraft } from "@/lib/card-draft";
+import { canDownload, type Access } from "@/lib/access";
 import { saveBlob } from "@/lib/save-blob";
 import { PLANS, rupiah } from "@/lib/plans";
 import CardPreview from "./CardPreview";
@@ -13,14 +14,16 @@ import CardPreview from "./CardPreview";
 type Format = "png" | "pdf";
 
 export default function CardEditor({
-  id, initialTemplate, initialData, pro, guest = false, autoDownload,
+  id, initialTemplate, initialData, access, guest = false, autoDownload,
 }: {
-  id: string | null; initialTemplate: string; initialData: CardData; pro: boolean;
+  id: string | null; initialTemplate: string; initialData: CardData; access: Access;
   guest?: boolean; autoDownload?: Format | null;
 }) {
   const supabase = useRef(createClient()).current;
   const router = useRouter();
   const [templateId, setTemplateId] = useState(initialTemplate);
+  const tier = getCardTemplate(templateId).tier;
+  const pro = canDownload(tier, access);
   const [data, setData] = useState(initialData);
   const [saved, setSaved] = useState(true);
   const [busy, setBusy] = useState<Format | null>(null);
@@ -60,7 +63,7 @@ export default function CardEditor({
     }
     if (!pro) {
       await persist();
-      router.push(`/bayar?next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
+      router.push(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
       return;
     }
     setBusy(format);
@@ -164,7 +167,9 @@ export default function CardEditor({
                     <div className="pointer-events-none">
                       <CardPreview data={t.defaults} templateId={t.id} />
                     </div>
-                    <p className="mt-1 truncate text-[11px] text-muted">{OCCASIONS[t.occasion]}</p>
+                    <p className="mt-1 truncate text-[11px] text-muted">
+                      {t.tier === "promax" ? <span className="font-bold text-ink">★ </span> : null}{OCCASIONS[t.occasion]}
+                    </p>
                   </button>
                 ))}
               </div>

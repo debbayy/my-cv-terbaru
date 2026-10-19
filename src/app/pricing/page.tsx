@@ -1,66 +1,97 @@
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/server";
-import { isPro, PLANS, rupiah } from "@/lib/plans";
-import Link from "next/link";
+import { getAccess, NO_ACCESS } from "@/lib/access";
+import { PLANS, rupiah } from "@/lib/plans";
+import { TEMPLATES } from "@/lib/templates";
+import { CARD_TEMPLATES } from "@/lib/card-templates";
+
+export const metadata = { title: "Harga — CVku" };
+
+const fmt = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 
 export default async function Pricing() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  let proUntil: string | null = null;
-  if (user) {
-    const { data } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
-    proUntil = data?.pro_until ?? null;
-  }
-  const pro = isPro(proUntil);
-  const plan = PLANS.pro_monthly;
+  const access = user ? await getAccess(supabase, user.id) : NO_ACCESS;
+  const pro = PLANS.pro_monthly;
+  const max = PLANS.promax_monthly;
+
+  const cvPro = TEMPLATES.filter((t) => t.tier === "pro").length;
+  const cardPro = CARD_TEMPLATES.filter((t) => t.tier === "pro").length;
+  const href = (plan: string) => {
+    const target = `/bayar?plan=${plan}&next=${encodeURIComponent("/dashboard")}`;
+    return user ? target : `/login?next=${encodeURIComponent(target)}`;
+  };
 
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+      <main className="pb-safe mx-auto max-w-6xl px-4 py-10 sm:py-14">
         <h1 className="font-display text-center text-3xl font-bold sm:text-4xl">Harga simpel</h1>
-        <p className="mt-2 text-center text-muted">Bikin dan edit CV selalu gratis. Bayar hanya saat mau download.</p>
+        <p className="mt-2 text-center text-muted">Isi dan preview semua template selalu gratis. Bayar hanya saat mau download.</p>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {/* GRATIS */}
           <div className="rounded-2xl border border-line bg-white p-6 sm:p-7">
             <h2 className="text-lg font-bold">Gratis</h2>
             <p className="font-display mt-2 text-4xl font-bold">Rp0</p>
             <ul className="mt-6 space-y-2 text-sm">
-              <li>✓ Semua template</li>
-              <li>✓ Editor + preview langsung</li>
-              <li>✓ Simpan CV di akun</li>
-              <li>✓ Desain kartu ucapan</li>
-              <li className="text-muted">✗ Download CV & kartu</li>
+              <li>✓ Isi & preview semua {TEMPLATES.length} template CV</li>
+              <li>✓ Isi & preview semua {CARD_TEMPLATES.length} kartu ucapan</li>
+              <li>✓ Simpan di akun</li>
+              <li className="text-muted">✗ Download</li>
             </ul>
           </div>
 
-          <div className="relative rounded-2xl bg-brand-dark p-6 text-white sm:p-7">
-            <span className="absolute -top-3 right-6 rounded-full bg-gold px-3 py-1 text-xs font-bold text-ink">PALING DIPILIH</span>
-            <h2 className="text-lg font-bold">{plan.name}</h2>
+          {/* PRO */}
+          <div className="rounded-2xl border-2 border-brand bg-white p-6 sm:p-7">
+            <h2 className="text-lg font-bold">Pro</h2>
             <p className="font-display mt-2 text-4xl font-bold">
-              {rupiah(plan.price)} <span className="font-sans text-base font-normal text-white/60">/ {plan.days} hari</span>
+              {rupiah(pro.price)} <span className="font-sans text-base font-normal text-muted">/ {pro.days} hari</span>
             </p>
             <ul className="mt-6 space-y-2 text-sm">
-              <li>✓ Semua fitur Gratis</li>
-              <li>✓ Download CV (PDF) tanpa batas & tanpa watermark</li>
-              <li>✓ Download kartu ucapan (PNG & PDF)</li>
-              <li>✓ PDF berbasis teks, terbaca ATS</li>
-              <li>✓ Tidak perpanjang otomatis — bayar lagi kalau perlu</li>
+              <li>✓ Download <strong>2 template pilihan per kategori</strong></li>
+              <li>✓ {cvPro} template CV (ATS & desain bebas)</li>
+              <li>✓ {cardPro} kartu ucapan untuk semua acara</li>
+              <li>✓ PDF tanpa watermark, terbaca ATS</li>
+              <li>✓ Download tanpa batas jumlah</li>
             </ul>
-            <div className="mt-7">
-              <Link href={user ? "/bayar?next=/dashboard" : "/login?next=%2Fbayar%3Fnext%3D%252Fdashboard"} className="btn-gold w-full py-3 text-base">
-                {pro ? "Perpanjang 30 hari lagi" : "Upgrade ke Pro"}
-              </Link>
-            </div>
-            {pro && proUntil && (
-              <p className="mt-3 text-center text-xs text-white/70">
-                Pro aktif sampai {new Date(proUntil).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}. Perpanjangan ditambahkan ke sisa masa aktif.
-              </p>
+            <Link href={href(pro.id)} className="btn-primary mt-7 w-full py-3 text-base">
+              {access.pro && !access.promax ? "Perpanjang Pro" : "Pilih Pro"}
+            </Link>
+            {access.pro && !access.promax && access.proUntil && (
+              <p className="mt-3 text-center text-xs text-muted">Pro aktif sampai {fmt(access.proUntil)}</p>
             )}
-            <p className="mt-3 text-center text-xs text-white/60">QRIS (semua e-wallet & m-banking) · GoPay · Virtual Account · Kartu</p>
+          </div>
+
+          {/* PRO MAX */}
+          <div className="relative rounded-2xl bg-brand-dark p-6 text-white sm:p-7">
+            <span className="absolute -top-3 right-6 rounded-full bg-gold px-3 py-1 text-xs font-bold text-ink">TERLENGKAP</span>
+            <h2 className="text-lg font-bold">Pro Max</h2>
+            <p className="font-display mt-2 text-4xl font-bold">
+              {rupiah(max.price)} <span className="font-sans text-base font-normal text-white/60">/ {max.days} hari</span>
+            </p>
+            <ul className="mt-6 space-y-2 text-sm">
+              <li>✓ Download <strong>SEMUA template</strong></li>
+              <li>✓ {TEMPLATES.length} template CV, termasuk koleksi ★ Pro Max</li>
+              <li>✓ {CARD_TEMPLATES.length} kartu ucapan, semua desain</li>
+              <li>✓ Template baru otomatis ikut terbuka</li>
+              <li>✓ Semua fitur Pro</li>
+            </ul>
+            <Link href={href(max.id)} className="btn-gold mt-7 w-full py-3 text-base">
+              {access.promax ? "Perpanjang Pro Max" : "Pilih Pro Max"}
+            </Link>
+            {access.promax && access.promaxUntil && (
+              <p className="mt-3 text-center text-xs text-white/70">Pro Max aktif sampai {fmt(access.promaxUntil)}</p>
+            )}
           </div>
         </div>
+
+        <p className="mt-8 text-center text-xs text-muted">
+          Sekali bayar, tidak perpanjang otomatis. Bayar via QRIS (semua e-wallet & m-banking), GoPay, Virtual Account, atau kartu.
+        </p>
       </main>
       <Footer />
     </>

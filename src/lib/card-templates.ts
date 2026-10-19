@@ -1,7 +1,9 @@
 import type { ComponentType } from "react";
 import type { CardData, Occasion } from "@/lib/card";
+import type { Tier } from "@/lib/plans";
 import * as C from "@/components/cards/cards";
 import * as D from "@/components/cards/cards2";
+import * as E from "@/components/cards/cards3";
 
 export type CardTemplate = {
   id: string;
@@ -9,9 +11,11 @@ export type CardTemplate = {
   occasion: Occasion;
   Component: ComponentType<{ data: CardData }>;
   defaults: CardData;
+  /** Diisi otomatis: 2 pertama per acara = "pro", sisanya "promax". */
+  tier: Tier;
 };
 
-export const CARD_TEMPLATES: CardTemplate[] = [
+const RAW: Omit<CardTemplate, "tier">[] = [
   {
     id: "ultah-confetti", name: "Confetti Pop", occasion: "ulang-tahun", Component: C.BirthdayConfetti,
     defaults: { to: "Untuk Nadia", headline: "Selamat Ulang Tahun!", message: "Semoga tahun ini penuh tawa, rezeki lancar,\ndan semua mimpimu satu per satu jadi nyata.", from: "Peluk hangat, Rina" },
@@ -104,6 +108,47 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     id: "imlek-lampion", name: "Lampion Merah", occasion: "imlek", Component: D.ImlekLampion,
     defaults: { to: "Untuk Koh Willy sekeluarga", headline: "Selamat Tahun Baru Imlek", message: "Semoga rezeki melimpah,\nsehat, dan bahagia sepanjang tahun.", from: "Rina" },
   },
+  {
+    id: "ramadan-bulan", name: "Bulan Sabit", occasion: "ramadan", Component: E.RamadanMoon,
+    defaults: { to: "Untuk sahabat", headline: "Ramadan Kareem", message: "Semoga Ramadan kali ini membawa\nketenangan, berkah, dan ampunan.", from: "Rina" },
+  },
+  {
+    id: "adha-hijau", name: "Kubah Hijau", occasion: "idul-adha", Component: E.AdhaGreen,
+    defaults: { to: "Untuk keluarga besar", headline: "Selamat Idul Adha 1448 H", message: "Semoga pengorbanan kita\nmembawa keberkahan untuk sesama.", from: "Keluarga Rina" },
+  },
+  {
+    id: "anniv-polaroid", name: "Polaroid Kenangan", occasion: "anniversary", Component: E.AnnivPolaroid,
+    defaults: { to: "Untuk kamu, partner terbaikku", headline: "Happy 3rd Anniversary", message: "Terima kasih untuk tawa, sabar,\ndan semua cerita kita.", from: "Love, aku" },
+  },
+  {
+    id: "bayi-pink", name: "Kereta Bayi", occasion: "kelahiran", Component: E.BabyPink,
+    defaults: { to: "Untuk keluarga Pak Andi", headline: "Congratulations!", message: "Selamat atas kelahiran putri tercinta.\nSemoga tumbuh sehat & bahagia.", from: "Tim Finance" },
+  },
+  {
+    id: "thanks-kraft", name: "Kraft Tag", occasion: "terima-kasih", Component: E.ThanksKraft,
+    defaults: { to: "Untuk pelanggan setia kami", headline: "Terima Kasih", message: "Sudah berbelanja di toko kami.\nSemoga suka dengan pesanannya!", from: "Toko Rina Craft" },
+  },
+  {
+    id: "newyear-gold", name: "Gold Minimal", occasion: "tahun-baru", Component: E.NewYearGold,
+    defaults: { to: "Happy New Year", headline: "Cheers to 2027", message: "Semoga tahun baru membawa\nkesempatan & kebahagiaan baru.", from: "Rina" },
+  },
+  {
+    id: "guru-papan", name: "Papan Tulis", occasion: "hari-guru", Component: E.TeacherBoard,
+    defaults: { to: "Untuk Bu Wati", headline: "Selamat Hari Guru", message: "Terima kasih sudah mengajar\ndengan sabar dan penuh cinta.", from: "Murid kelas 6B" },
+  },
+  {
+    id: "merdeka-bendera", name: "Merah Putih", occasion: "kemerdekaan", Component: E.MerdekaFlag,
+    defaults: { to: "Untuk seluruh rakyat Indonesia", headline: "Dirgahayu Republik Indonesia ke-82", message: "Bersatu, berdaulat, rakyat sejahtera,\nIndonesia maju!", from: "Keluarga Rina" },
+  },
 ];
+
+const PRO_PER_OCCASION = 2;
+export const CARD_TEMPLATES: CardTemplate[] = (() => {
+  const seen: Partial<Record<Occasion, number>> = {};
+  return RAW.map((t) => {
+    seen[t.occasion] = (seen[t.occasion] ?? 0) + 1;
+    return { ...t, tier: (seen[t.occasion]! <= PRO_PER_OCCASION ? "pro" : "promax") as Tier };
+  });
+})();
 
 export const getCardTemplate = (id: string) => CARD_TEMPLATES.find((t) => t.id === id) ?? CARD_TEMPLATES[0];

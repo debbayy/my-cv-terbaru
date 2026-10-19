@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signPrintToken } from "@/lib/print-token";
 import { launchBrowser } from "@/lib/browser";
 import { getTemplate } from "@/lib/templates";
-import { isPro } from "@/lib/plans";
+import { canDownload, getAccess } from "@/lib/access";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -19,9 +19,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { data: cv } = await supabase.from("cvs").select("id,template_id").eq("id", id).single();
   if (!cv) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  // 2) Cek status Pro — INI paywall-nya. Jangan pernah dipindah ke client.
-  const { data: profile } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
-  if (!isPro(profile?.pro_until)) return NextResponse.json({ error: "pro_required" }, { status: 402 });
+  // 2) Cek paket: template Pro butuh Pro/Pro Max, template Pro Max butuh Pro Max. INI paywall-nya.
+  const tier = getTemplate(cv.template_id).tier;
+  if (!canDownload(tier, await getAccess(supabase, user.id)))
+    return NextResponse.json({ error: `${tier}_required`, need: tier }, { status: 402 });
 
   // 3) Render /print/[id] di Chromium → PDF berbasis teks
   const base = appUrl(req.nextUrl.origin);

@@ -10,7 +10,7 @@ export const CARD_H = 675;
 
 export type Occasion =
   | "ulang-tahun" | "lebaran" | "ramadan" | "idul-adha" | "pernikahan" | "anniversary" | "kelahiran"
-  | "wisuda" | "selamat" | "terima-kasih" | "hari-ibu" | "lekas-sembuh" | "duka-cita" | "natal" | "imlek" | "tahun-baru";
+  | "wisuda" | "selamat" | "terima-kasih" | "hari-ibu" | "lekas-sembuh" | "duka-cita" | "natal" | "imlek" | "tahun-baru" | "hari-guru" | "kemerdekaan";
 
 export const OCCASIONS: Record<Occasion, string> = {
   "ulang-tahun": "Ulang Tahun",
@@ -29,6 +29,8 @@ export const OCCASIONS: Record<Occasion, string> = {
   natal: "Natal",
   imlek: "Imlek",
   "tahun-baru": "Tahun Baru",
+  "hari-guru": "Hari Guru",
+  kemerdekaan: "17 Agustus",
 };
 
 export const normalizeCard = (raw: unknown, fallback: CardData): CardData => {

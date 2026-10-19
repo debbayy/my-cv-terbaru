@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import CardEditor from "@/components/card-editor/CardEditor";
+import type { Access } from "@/lib/access";
 import { loadCardDraft, newCardDraft, saveCardDraft, type CardDraft } from "@/lib/card-draft";
 import { getCardTemplate } from "@/lib/card-templates";
 
-export default function GuestCardEditor({ template, pro }: { template?: string; pro: boolean }) {
+export default function GuestCardEditor({ template, access }: { template?: string; access: Access }) {
   const [draft, setDraft] = useState<CardDraft | null>(null);
 
   useEffect(() => {
@@ -19,5 +20,5 @@ export default function GuestCardEditor({ template, pro }: { template?: string; 
   }, [template]);
 
   if (!draft) return <div className="min-h-app grid place-items-center text-sm text-muted">Menyiapkan kartu…</div>;
-  return <CardEditor id={null} guest pro={pro} initialTemplate={draft.templateId} initialData={draft.data} />;
+  return <CardEditor id={null} guest access={access} initialTemplate={draft.templateId} initialData={draft.data} />;
 }

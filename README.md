@@ -93,6 +93,15 @@ supabase/schema.sql
 ## Update database
 Sudah pernah menjalankan `schema.sql` versi lama? Jalankan `supabase/migration-002-cards.sql` di SQL Editor untuk tabel kartu ucapan (atau jalankan ulang `schema.sql` — aman).
 
+## Paket
+| Paket | Harga | Akses download |
+|---|---|---|
+| Gratis | Rp0 | Isi & preview semua template (watermark) |
+| Pro | Rp50.000 / 30 hari | 2 template pertama di tiap kategori (CV ATS, CV desain bebas, tiap acara kartu) |
+| Pro Max | Rp99.000 / 30 hari | Semua template |
+
+Harga di `src/lib/plans.ts`. Pembagian Pro/Pro Max otomatis: urutan template di registry — 2 teratas tiap kategori = Pro (`PRO_PER_CATEGORY`). Wajib jalankan `supabase/migration-003-promax.sql`.
+
 ## Kartu ucapan
 Desain ada di `src/components/cards/cards.tsx`, gaya di `src/app/cards.css`, daftar & teks contoh di `src/lib/card-templates.ts`. Ukuran kanvas 540×675 px → export PNG 1080×1350 (pas WA/IG) atau PDF. Di HP, tombol Download PNG langsung membuka menu Share.
 

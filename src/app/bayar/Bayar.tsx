@@ -6,11 +6,17 @@ import QRCode from "qrcode";
 import { rupiah } from "@/lib/plans";
 import { saveBlob } from "@/lib/save-blob";
 
-type Plan = { id: string; name: string; price: number; days: number };
+import type { Plan, PlanId, Tier } from "@/lib/plans";
 type Phase = "creating" | "waiting" | "paid" | "expired" | "error";
 
-export default function Bayar({ next, returningOrder, plan }: { next: string; returningOrder: string | null; plan: Plan }) {
+export default function Bayar({
+  next, returningOrder, plans, initialPlan, need,
+}: {
+  next: string; returningOrder: string | null; plans: Plan[]; initialPlan: PlanId; need: Tier;
+}) {
   const router = useRouter();
+  const [planId, setPlanId] = useState<PlanId>(initialPlan);
+  const plan = plans.find((p) => p.id === planId) ?? plans[0];
   const [phase, setPhase] = useState<Phase>(returningOrder ? "waiting" : "creating");
   const [orderId, setOrderId] = useState<string | null>(returningOrder);
   const [qr, setQr] = useState<string | null>(null);
@@ -49,10 +55,12 @@ export default function Bayar({ next, returningOrder, plan }: { next: string; re
     }
   }, [plan.id, next]);
 
-  // Langsung buat QRIS begitu halaman dibuka — tanpa klik tambahan
+  // Langsung buat QRIS begitu halaman dibuka — tanpa klik tambahan. Ganti paket → QR baru.
   useEffect(() => {
-    if (started.current || returningOrder) return;
+    if (returningOrder && !started.current) { started.current = true; return; }
     started.current = true;
+    setQr(null);
+    setPhase("creating");
     charge("qris");
   }, [charge, returningOrder]);
 
@@ -99,14 +107,32 @@ export default function Bayar({ next, returningOrder, plan }: { next: string; re
       <Link href={next} className="text-sm text-muted hover:text-ink">← Kembali</Link>
 
       <div className="mt-4 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex items-baseline justify-between gap-3">
-          <div>
-            <p className="text-sm text-muted">{plan.name}</p>
-            <p className="font-display text-3xl font-bold">{rupiah(plan.price)}</p>
-          </div>
-          <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold">PRO</span>
+        <p className="text-sm font-semibold">Pilih paket</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {plans.map((p) => {
+            const locked = need === "promax" && p.tier === "pro";
+            const active = p.id === planId;
+            return (
+              <button
+                key={p.id}
+                disabled={locked || phase === "paid" || !!busy}
+                onClick={() => setPlanId(p.id)}
+                className={`relative rounded-xl border-2 p-3 text-left transition disabled:cursor-not-allowed ${active ? "border-brand bg-brand/5" : "border-line"} ${locked ? "opacity-45" : ""}`}
+              >
+                {p.tier === "promax" && <span className="absolute -top-2 right-2 rounded-full bg-gold px-1.5 text-[10px] font-bold">TERLENGKAP</span>}
+                <p className="text-xs font-semibold text-muted">{p.tier === "promax" ? "PRO MAX" : "PRO"}</p>
+                <p className="text-lg font-bold leading-tight">{rupiah(p.price)}</p>
+                <p className="mt-1 text-[11px] leading-snug text-muted">{p.tier === "promax" ? "Semua template" : "2 template / kategori"}</p>
+              </button>
+            );
+          })}
         </div>
-        <p className="mt-1 text-xs text-muted">Download CV & kartu ucapan sepuasnya selama {plan.days} hari. Tidak perpanjang otomatis.</p>
+        <p className="mt-2 text-xs text-muted">
+          {need === "promax"
+            ? "Template yang kamu pilih termasuk koleksi Pro Max."
+            : plan.tagline + "."}{" "}
+          Berlaku {plan.days} hari, tidak perpanjang otomatis.
+        </p>
 
         <div className="mt-5 border-t border-line pt-5 text-center">
           {phase === "paid" ? (

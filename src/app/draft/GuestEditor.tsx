@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import Editor from "@/components/editor/Editor";
+import type { Access } from "@/lib/access";
 import { loadDraft, newDraft, saveDraft, type Draft } from "@/lib/draft";
 import { getTemplate } from "@/lib/templates";
 
-export default function GuestEditor({ template, pro }: { template?: string; pro: boolean }) {
+export default function GuestEditor({ template, access }: { template?: string; access: Access }) {
   const [draft, setDraft] = useState<Draft | null>(null);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export default function GuestEditor({ template, pro }: { template?: string; pro:
     <Editor
       id={null}
       guest
-      pro={pro}
+      access={access}
       initialTitle={draft.title}
       initialTemplate={draft.templateId}
       initialData={draft.data}

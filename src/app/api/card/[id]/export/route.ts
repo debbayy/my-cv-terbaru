@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { signPrintToken } from "@/lib/print-token";
 import { launchBrowser } from "@/lib/browser";
 import { appUrl } from "@/lib/config";
-import { isPro } from "@/lib/plans";
+import { canDownload, getAccess } from "@/lib/access";
+import { getCardTemplate } from "@/lib/card-templates";
 import { CARD_H, CARD_W } from "@/lib/card";
 
 export const runtime = "nodejs";
@@ -17,11 +18,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { data: card } = await supabase.from("cards").select("id").eq("id", id).single();
+  const { data: card } = await supabase.from("cards").select("id,template_id").eq("id", id).single();
   if (!card) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  const { data: profile } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
-  if (!isPro(profile?.pro_until)) return NextResponse.json({ error: "pro_required" }, { status: 402 });
+  const tier = getCardTemplate(card.template_id).tier;
+  if (!canDownload(tier, await getAccess(supabase, user.id)))
+    return NextResponse.json({ error: `${tier}_required`, need: tier }, { status: 402 });
 
   const url = `${appUrl(req.nextUrl.origin)}/print-card/${id}?token=${encodeURIComponent(signPrintToken(`card:${id}`))}`;
   const browser = await launchBrowser();

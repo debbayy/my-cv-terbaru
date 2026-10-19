@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { isPro } from "@/lib/plans";
+import { getAccess, NO_ACCESS } from "@/lib/access";
 
 export default async function Navbar() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  let pro = false;
-  if (user) {
-    const { data } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
-    pro = isPro(data?.pro_until);
-  }
+  const access = user ? await getAccess(supabase, user.id) : NO_ACCESS;
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-paper/90 backdrop-blur" style={{ paddingTop: "env(safe-area-inset-top)" }}>
@@ -23,7 +19,9 @@ export default async function Navbar() {
           <Link href="/pricing" className="hidden px-2 py-1 text-muted hover:text-ink min-[400px]:block">Harga</Link>
           {user ? (
             <>
-              {pro && <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-bold">PRO</span>}
+              {access.pro && (
+                <span className="hidden rounded-full bg-gold px-2 py-0.5 text-xs font-bold min-[420px]:inline">{access.promax ? "PRO MAX" : "PRO"}</span>
+              )}
               <Link href="/dashboard" className="btn-primary whitespace-nowrap px-3 sm:px-4">Akun Saya</Link>
             </>
           ) : (

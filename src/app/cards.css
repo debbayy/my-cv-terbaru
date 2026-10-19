@@ -194,3 +194,65 @@
 .c-gradp .to { font-size: 19px; font-weight: 600; margin-top: 10px; }
 .c-gradp .msg { font-size: 17px; line-height: 1.5; margin-top: 12px; }
 .c-gradp .from { margin-top: 16px; font-weight: 600; color: #2a9d8f; }
+
+/* ======== Kartu tambahan 3 ======== */
+.c-rmoon { background: linear-gradient(#0b132b, #1c2541); color: #f1ead6; font-family: "Playfair Display", serif; }
+.c-rmoon .inner { margin-top: 250px; margin-bottom: auto; }
+.c-rmoon .to { font-family: "Inter", sans-serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #e9c46a; }
+.c-rmoon h1 { font-size: 42px; font-style: italic; line-height: 1.15; margin: 10px 0 14px; color: #e9c46a; }
+.c-rmoon .msg { font-family: "Inter", sans-serif; font-size: 16px; line-height: 1.6; }
+.c-rmoon .from { margin-top: 16px; font-style: italic; font-size: 18px; }
+
+.c-adhag { background: #f7f3e3; color: #1b4332; font-family: "Playfair Display", serif; }
+.c-adhag .inner { margin-top: 110px; margin-bottom: auto; }
+.c-adhag .to { font-family: "Inter", sans-serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #2d6a4f; }
+.c-adhag h1 { font-size: 38px; font-weight: 700; line-height: 1.15; margin: 10px 0 14px; }
+.c-adhag .msg { font-family: "Inter", sans-serif; font-size: 16px; line-height: 1.6; color: #40916c; }
+.c-adhag .from { margin-top: 14px; font-style: italic; font-size: 18px; }
+
+.c-polaroid { background: #fbe9e7; color: #5d4037; flex-direction: column; font-family: "Fredoka", sans-serif; }
+.c-polaroid .photo { position: relative; z-index: 1; margin: 56px auto 0; background: #fff; padding: 16px 16px 0; width: 330px; transform: rotate(-3deg); box-shadow: 0 10px 24px rgba(93,64,55,.18); }
+.c-polaroid .pic { height: 240px; background: linear-gradient(135deg, #ef9a9a, #ce93d8); display: grid; place-items: center; }
+.c-polaroid .pic svg { width: 120px; }
+.c-polaroid .cap { font-family: "Pacifico", cursive; font-size: 30px; text-align: center; padding: 14px 0 18px; color: #c2185b; }
+.c-polaroid .inner { margin: 26px auto auto; }
+.c-polaroid .to { font-weight: 600; font-size: 18px; }
+.c-polaroid .msg { font-size: 17px; line-height: 1.5; margin-top: 8px; }
+.c-polaroid .from { margin-top: 12px; font-weight: 600; color: #c2185b; }
+
+.c-babyp { background: #fff5f7; color: #6d4c5c; font-family: "Fredoka", sans-serif; }
+.c-babyp .inner { margin-top: 270px; margin-bottom: auto; }
+.c-babyp .to { font-weight: 600; font-size: 17px; }
+.c-babyp h1 { font-size: 40px; font-weight: 700; line-height: 1.1; margin: 8px 0 4px; color: #e5738f; }
+.c-babyp .sub { font-family: "Pacifico", cursive; font-size: 19px; color: #7fb069; }
+.c-babyp .msg { font-size: 17px; line-height: 1.5; margin-top: 12px; }
+.c-babyp .from { margin-top: 14px; font-weight: 600; }
+
+.c-kraft { background: #c8a27c; color: #3e2c1c; font-family: "Playfair Display", serif; }
+.c-kraft .tag { position: relative; z-index: 1; margin: auto; width: 400px; background: #fffaf2; padding: 46px 34px; border-radius: 6px; box-shadow: 0 8px 20px rgba(62,44,28,.25); }
+.c-kraft .tag::before { content: ""; position: absolute; top: 16px; left: 50%; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: #c8a27c; }
+.c-kraft h1 { font-family: "Pacifico", cursive; font-weight: 400; font-size: 46px; color: #8b5e34; margin-top: 10px; }
+.c-kraft .to { font-family: "Inter", sans-serif; font-size: 15px; font-weight: 600; margin-top: 6px; }
+.c-kraft .msg { font-family: "Inter", sans-serif; font-size: 15px; line-height: 1.6; margin-top: 12px; }
+.c-kraft .from { margin-top: 16px; font-style: italic; font-size: 17px; }
+.c-kraft .twine { position: absolute; left: 0; top: 0; width: 100%; }
+
+.c-nygold { background: #111; color: #f5f0e1; font-family: "Playfair Display", serif; }
+.c-nygold .to { font-family: "Inter", sans-serif; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #d4af37; }
+.c-nygold h1 { font-size: 46px; font-weight: 400; line-height: 1.1; margin: 14px 0 16px; color: #d4af37; }
+.c-nygold .msg { font-family: "Inter", sans-serif; font-size: 16px; line-height: 1.6; color: #cfc8b5; }
+.c-nygold .from { margin-top: 20px; font-style: italic; font-size: 18px; }
+
+.c-board { background: #efe6d8; color: #fff; font-family: "Fredoka", sans-serif; }
+.c-board .to { font-size: 16px; color: #ffd166; font-weight: 600; }
+.c-board h1 { font-family: "Pacifico", cursive; font-weight: 400; font-size: 44px; margin: 6px 0 12px; }
+.c-board .msg { font-size: 17px; line-height: 1.5; color: #e7f0ea; }
+.c-board .from { margin-top: 14px; font-weight: 600; color: #ffd166; }
+
+.c-merdeka { background: #fff; color: #222; font-family: "Poppins", sans-serif; }
+.c-merdeka .inner { margin-top: 200px; margin-bottom: auto; }
+.c-merdeka .to { font-family: "Inter", sans-serif; font-size: 14px; font-weight: 600; color: #d62828; }
+.c-merdeka h1 { font-size: 36px; line-height: 1.12; font-weight: 700; margin: 8px 0 4px; }
+.c-merdeka .sub { font-size: 26px; font-weight: 700; color: #d62828; letter-spacing: 2px; }
+.c-merdeka .msg { font-family: "Inter", sans-serif; font-size: 16px; line-height: 1.6; margin-top: 10px; color: #444; }
+.c-merdeka .from { margin-top: 14px; font-weight: 600; }

@@ -22,6 +22,7 @@ export default function KartuGallery() {
         <h1 className="font-display text-3xl font-bold sm:text-4xl">Kartu ucapan</h1>
         <p className="mt-2 max-w-xl text-muted">
           Pilih desain, ganti teksnya, lalu download PNG untuk WhatsApp/Instagram atau PDF untuk dicetak. Nggak perlu daftar untuk mencoba.
+          Desain bertanda <span className="rounded bg-ink px-1 text-[10px] font-bold text-gold">PRO MAX</span> khusus paket Pro Max.
         </p>
 
         <nav className="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
@@ -41,7 +42,10 @@ export default function KartuGallery() {
                   <div className="pointer-events-none overflow-hidden rounded-xl shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-lg">
                     <CardPreview data={t.defaults} templateId={t.id} />
                   </div>
-                  <p className="mt-2 font-semibold">{t.name}</p>
+                  <p className="mt-2 text-sm font-semibold sm:text-base">
+                    {t.name}
+                    {t.tier === "promax" && <span className="ml-1.5 rounded bg-ink px-1.5 py-0.5 align-middle text-[10px] font-bold text-gold">PRO MAX</span>}
+                  </p>
                 </a>
               ))}
             </div>

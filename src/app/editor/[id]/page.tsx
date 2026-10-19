@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeCv } from "@/lib/cv";
-import { isPro } from "@/lib/plans";
+import { getAccess } from "@/lib/access";
 import Editor from "@/components/editor/Editor";
 
 export default async function EditorPage({
@@ -15,9 +15,9 @@ export default async function EditorPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/editor/${id}`);
 
-  const [{ data: cv }, { data: profile }] = await Promise.all([
+  const [{ data: cv }, access] = await Promise.all([
     supabase.from("cvs").select("id,title,template_id,data").eq("id", id).single(),
-    supabase.from("profiles").select("pro_until").eq("id", user.id).single(),
+    getAccess(supabase, user.id),
   ]);
   if (!cv) notFound();
 
@@ -27,7 +27,7 @@ export default async function EditorPage({
       initialTitle={cv.title}
       initialTemplate={cv.template_id}
       initialData={normalizeCv(cv.data)}
-      pro={isPro(profile?.pro_until)}
+      access={access}
       autoDownload={download === "1"}
     />
   );

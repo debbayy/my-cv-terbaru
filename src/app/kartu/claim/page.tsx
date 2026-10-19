@@ -2,6 +2,8 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { canDownload, getAccess } from "@/lib/access";
+import { getCardTemplate } from "@/lib/card-templates";
 import { clearCardDraft, loadCardDraft } from "@/lib/card-draft";
 
 function Claim() {
@@ -31,10 +33,10 @@ function Claim() {
       }
       clearCardDraft();
       const after = `/kartu/${data.id}?download=${format}`;
-      const { data: prof } = await supabase.from("profiles").select("pro_until").eq("id", user.id).single();
-      const pro = !!prof?.pro_until && new Date(prof.pro_until).getTime() > Date.now();
+      const tier = getCardTemplate(draft.templateId).tier;
+      const pro = canDownload(tier, await getAccess(supabase, user.id));
       // Belum Pro → langsung ke halaman bayar QRIS; setelah lunas otomatis kembali & download
-      router.replace(pro ? after : `/bayar?next=${encodeURIComponent(after)}`);
+      router.replace(pro ? after : `/bayar?need=${tier}&next=${encodeURIComponent(after)}`);
     })();
   }, [router, format]);
 
