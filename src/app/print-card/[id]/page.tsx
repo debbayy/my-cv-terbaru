@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { verifyPrintToken } from "@/lib/print-token";
 import { normalizeCard } from "@/lib/card";
 import { getCardTemplate } from "@/lib/card-templates";
@@ -17,7 +17,7 @@ export default async function PrintCard({
   const { token } = await searchParams;
   if (!verifyPrintToken(`card:${id}`, token)) notFound();
 
-  const { data: card } = await createAdminClient().from("cards").select("template_id,data").eq("id", id).single();
+  const { data: card } = await (await createClient()).from("cards").select("template_id,data").eq("id", id).single();
   if (!card) notFound();
   const t = getCardTemplate(card.template_id);
   return <t.Component data={normalizeCard(card.data, t.defaults)} />;

@@ -6,6 +6,7 @@ import { launchBrowser } from "@/lib/browser";
 import { getTemplate } from "@/lib/templates";
 import { canDownload, canUseFree, getAccess } from "@/lib/access";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { errorDetail, forwardSession } from "@/lib/render-session";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
+    await forwardSession(page, req, base);
     const res = await page.goto(url, { waitUntil: "networkidle0", timeout: 30_000 });
     if (!res?.ok()) throw new Error(`print page ${res?.status()}`);
     await page.evaluate(() => document.fonts.ready);
@@ -63,7 +65,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     console.error("[pdf]", e);
     // Gagal membuat PDF → kembalikan kuota gratis yang terpakai
     if (usingFree) await createAdminClient().rpc("refund_free_download", { p_user: user.id }).then(() => {}, () => {});
-    return NextResponse.json({ error: "pdf_failed" }, { status: 500 });
+    return NextResponse.json({ error: "pdf_failed", detail: errorDetail(e) }, { status: 500 });
   } finally {
     await browser.close();
   }

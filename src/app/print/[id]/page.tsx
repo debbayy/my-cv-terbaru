@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { verifyPrintToken } from "@/lib/print-token";
 import { normalizeCv } from "@/lib/cv";
 import { getTemplate } from "@/lib/templates";
@@ -20,7 +20,7 @@ export default async function PrintPage({
   const { token } = await searchParams;
   if (!verifyPrintToken(id, token)) notFound();
 
-  const { data: cv } = await createAdminClient().from("cvs").select("template_id,data").eq("id", id).single();
+  const { data: cv } = await (await createClient()).from("cvs").select("template_id,data").eq("id", id).single();
   if (!cv) notFound();
 
   const tpl = getTemplate(cv.template_id);

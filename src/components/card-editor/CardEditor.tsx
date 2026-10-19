@@ -80,7 +80,10 @@ export default function CardEditor({
         go(`/bayar?need=${tier}&next=${encodeURIComponent(`/kartu/${id}?download=${format}`)}`);
         return;
       }
-      if (!res.ok) throw new Error("Gagal membuat file. Coba lagi sebentar.");
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(`Gagal membuat file. Coba lagi sebentar.${j.detail ? ` (${j.detail})` : ""}`);
+      }
       const blob = await res.blob();
       const name = `Kartu - ${data.headline.replace(/[^\w\- ]+/g, "").trim() || "Ucapan"}.${format}`;
       // Di HP (iPhone/Android): buka menu Share → langsung kirim ke WhatsApp/IG. Desktop: download biasa.

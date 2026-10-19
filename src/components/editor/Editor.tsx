@@ -115,7 +115,10 @@ export default function Editor({
         go(`/bayar?need=${tier}&next=${encodeURIComponent(`/editor/${id}?download=1`)}`);
         return;
       }
-      if (!res.ok) throw new Error("Gagal membuat PDF. Coba lagi sebentar.");
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(`Gagal membuat PDF. Coba lagi sebentar.${j.detail ? ` (${j.detail})` : ""}`);
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       saveBlob(url, `${(data.personal.fullName || title).replace(/[^\w\- ]+/g, "").trim() || "CV"} - CV.pdf`);
