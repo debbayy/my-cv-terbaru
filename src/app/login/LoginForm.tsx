@@ -14,7 +14,22 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<{ type: "error" | "info"; text: string } | null>(null);
+  const urlError = params.get("error");
+  const [msg, setMsg] = useState<{ type: "error" | "info"; text: string } | null>(
+    urlError ? { type: "error", text: urlError } : null,
+  );
+
+  // Terjemahkan error Supabase supaya penyebabnya kelihatan
+  const explain = (m: string) => {
+    const t = m.toLowerCase();
+    if (t.includes("email not confirmed")) return "Email belum dikonfirmasi. Cek inbox/spam, klik link konfirmasi, lalu masuk lagi.";
+    if (t.includes("invalid login credentials")) return "Email atau password salah (atau akun belum terdaftar — klik Daftar).";
+    if (t.includes("already registered")) return "Email sudah terdaftar. Silakan masuk.";
+    if (t.includes("provider is not enabled")) return "Login Google belum diaktifkan di Supabase. Pakai email dulu.";
+    if (t.includes("database error")) return "Gagal membuat akun di database. Pastikan schema.sql sudah dijalankan di Supabase.";
+    if (t.includes("rate limit")) return "Terlalu banyak percobaan / email. Tunggu beberapa menit lalu coba lagi.";
+    return m;
+  };
 
   const callback = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
@@ -24,7 +39,7 @@ export default function LoginForm() {
     setMsg(null);
     if (mode === "login") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setMsg({ type: "error", text: "Email atau password salah." });
+      if (error) setMsg({ type: "error", text: explain(error.message) });
       else {
         router.replace(next);
         router.refresh();
@@ -35,7 +50,7 @@ export default function LoginForm() {
         password,
         options: { emailRedirectTo: callback() },
       });
-      if (error) setMsg({ type: "error", text: error.message });
+      if (error) setMsg({ type: "error", text: explain(error.message) });
       else if (data.session) {
         router.replace(next);
         router.refresh();
@@ -45,7 +60,8 @@ export default function LoginForm() {
   }
 
   async function google() {
-    await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callback() } });
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callback() } });
+    if (error) setMsg({ type: "error", text: explain(error.message) });
   }
 
   return (
