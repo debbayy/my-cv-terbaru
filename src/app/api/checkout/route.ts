@@ -1,3 +1,4 @@
+import { appUrl } from "@/lib/config";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
   if (!plan) return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
 
   const orderId = `CVKU-${user.id.slice(0, 8)}-${Date.now()}`;
-  const base = process.env.APP_URL || req.nextUrl.origin;
+  const base = appUrl(req.nextUrl.origin);
 
   // Harga diambil dari server (PLANS), BUKAN dari client.
   const { error } = await createAdminClient().from("payments").insert({

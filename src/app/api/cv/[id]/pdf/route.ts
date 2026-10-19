@@ -1,3 +1,4 @@
+import { appUrl } from "@/lib/config";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { signPrintToken } from "@/lib/print-token";
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!isPro(profile?.pro_until)) return NextResponse.json({ error: "pro_required" }, { status: 402 });
 
   // 3) Render /print/[id] di Chromium → PDF berbasis teks
-  const base = process.env.APP_URL || req.nextUrl.origin;
+  const base = appUrl(req.nextUrl.origin);
   const url = `${base}/print/${id}?token=${encodeURIComponent(signPrintToken(id))}`;
   const tpl = getTemplate(cv.template_id);
 

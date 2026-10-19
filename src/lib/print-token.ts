@@ -5,10 +5,13 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  * Token sekali pakai berumur pendek supaya Chromium (tanpa cookie login)
  * bisa membuka /print/[id]. Tanpa token valid, halaman print menolak.
  */
+// PRINT_SECRET opsional: kalau kosong, diturunkan dari service role key (tetap rahasia, tidak perlu env tambahan)
 const secret = () => {
   const s = process.env.PRINT_SECRET;
-  if (!s || s.length < 32) throw new Error("PRINT_SECRET belum di-set (min 32 karakter)");
-  return s;
+  if (s && s.length >= 32) return s;
+  const base = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!base) throw new Error("SUPABASE_SERVICE_ROLE_KEY belum di-set");
+  return createHmac("sha256", base).update("cvku-print-token").digest("hex");
 };
 
 export function signPrintToken(cvId: string, ttlSeconds = 60) {
