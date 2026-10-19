@@ -81,8 +81,9 @@
 .c-newyear .from { margin-top: 20px; font-size: 17px; font-weight: 600; }
 
 /* Watermark kartu (preview saja) */
-.card-watermark { position: absolute; inset: 0; z-index: 5; pointer-events: none; display: grid; place-items: center; }
-.card-watermark span { transform: rotate(-30deg); font: 700 54px/1 "Inter", sans-serif; color: rgba(0,0,0,.12); letter-spacing: 6px; white-space: nowrap; }
+.card-watermark { position: absolute; inset: 0; z-index: 5; pointer-events: none; display: grid; place-items: center;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='170'><text x='10' y='105' transform='rotate(-28 130 85)' font-family='Arial' font-weight='700' font-size='26' fill='%23000000' fill-opacity='0.18'>CVku • PREVIEW</text></svg>"); background-size: 220px 145px; }
+.card-watermark span { transform: rotate(-30deg); font: 700 54px/1 "Inter", sans-serif; color: rgba(255,255,255,.35); text-shadow: 0 0 2px rgba(0,0,0,.35); letter-spacing: 6px; white-space: nowrap; }
 
 @media print { .card-print-root { margin: 0; } }
 

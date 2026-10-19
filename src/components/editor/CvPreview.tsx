@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CvData } from "@/lib/cv";
 import { getTemplate } from "@/lib/templates";
+import { useVeil } from "@/lib/use-veil";
 
 const A4_PX = 794; // 210mm @ 96dpi
 
@@ -21,6 +22,7 @@ export default function CvPreview({
   const [height, setHeight] = useState(1123);
   const tpl = getTemplate(templateId);
   const padded = tpl.pdfMargin.top !== "0";
+  const veiled = useVeil(watermark);
 
   useEffect(() => {
     if (!wrap.current || !page.current) return;
@@ -34,10 +36,10 @@ export default function CvPreview({
   }, []);
 
   return (
-    <div ref={wrap} className="w-full" style={{ height: height * scale }}>
+    <div ref={wrap} className={`veil-wrap w-full ${veiled ? "veiled" : ""}`} style={{ height: height * scale }}>
       <div
         ref={page}
-        className={`cv-page shadow-[0_8px_30px_rgba(0,0,0,.08)] ${padded ? "pad" : ""}`}
+        className={`veil-target cv-page shadow-[0_8px_30px_rgba(0,0,0,.08)] ${padded ? "pad" : ""}`}
         style={{ transform: `scale(${scale})`, transformOrigin: "top left", userSelect: watermark ? "none" : undefined }}
         onCopy={watermark ? (e) => e.preventDefault() : undefined}
       >
@@ -48,6 +50,7 @@ export default function CvPreview({
           </div>
         )}
       </div>
+      {watermark && <div className="veil-msg">Preview disembunyikan.<br />Klik halaman untuk lanjut.</div>}
     </div>
   );
 }

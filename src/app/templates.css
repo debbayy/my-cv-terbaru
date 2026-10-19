@@ -93,11 +93,12 @@
 /* ---------------- Watermark (preview saja, tidak pernah ada di /print) ---------------- */
 .cv-watermark {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5;
-  background-image: repeating-linear-gradient(-30deg, transparent 0 120px, rgba(47,93,80,.06) 120px 122px);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='170'><text x='10' y='105' transform='rotate(-28 130 85)' font-family='Arial' font-weight='700' font-size='26' fill='%232f5d50' fill-opacity='0.16'>CVku • PREVIEW</text></svg>");
+  background-size: 260px 170px;
 }
 .cv-watermark span {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) rotate(-30deg);
-  font: 700 64px/1 "Inter", sans-serif; color: rgba(47,93,80,.10); white-space: nowrap; letter-spacing: 6px;
+  font: 700 72px/1 "Inter", sans-serif; color: rgba(47,93,80,.14); white-space: nowrap; letter-spacing: 6px;
 }
 
 /* Halaman /print: kertas putih polos, margin diatur Puppeteer */
@@ -204,3 +205,13 @@
 .tpl-bold .at { color: #555; }
 
 @media print { .tpl-mheader { min-height: 296mm; } }
+
+/* Preview non-Pro tersamar saat jendela tidak aktif (anti screenshot) */
+.veil-wrap { position: relative; }
+.veil-wrap > .veil-target { transition: filter .12s ease; }
+.veil-wrap.veiled > .veil-target { filter: blur(14px); }
+.veil-wrap .veil-msg {
+  display: none; position: absolute; inset: 0; z-index: 10; place-items: center; text-align: center;
+  font: 600 14px/1.4 "Inter", sans-serif; color: #1c1b19; background: rgba(246,243,238,.55);
+}
+.veil-wrap.veiled .veil-msg { display: grid; }
