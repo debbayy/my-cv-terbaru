@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { getTemplate, TEMPLATES } from "@/lib/templates";
-import { isPro } from "@/lib/plans";
+import { isPro, rupiah } from "@/lib/plans";
 import { deleteCard, deleteCv } from "./actions";
 import { getCardTemplate } from "@/lib/card-templates";
 import { OCCASIONS } from "@/lib/card";
@@ -14,10 +14,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: cvs }, { data: profile }, { data: cards }] = await Promise.all([
+  const [{ data: cvs }, { data: profile }, { data: cards }, { data: pays }] = await Promise.all([
     supabase.from("cvs").select("id,title,template_id,updated_at").order("updated_at", { ascending: false }),
     supabase.from("profiles").select("pro_until").eq("id", user.id).single(),
     supabase.from("cards").select("id,title,template_id,updated_at").order("updated_at", { ascending: false }),
+    supabase.from("payments").select("order_id,amount,status,paid_at,created_at").eq("status", "paid").order("created_at", { ascending: false }).limit(10),
   ]);
   const pro = isPro(profile?.pro_until);
   const fmt = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
@@ -109,6 +110,23 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               );
             })}
           </ul>
+        )}
+        {!!pays?.length && (
+          <>
+            <h2 className="mb-3 mt-12 text-sm font-semibold uppercase tracking-wider text-muted">Riwayat pembayaran</h2>
+            <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white text-sm">
+              {pays.map((p) => (
+                <li key={p.order_id} className="flex items-center justify-between gap-3 px-3 py-3 sm:px-4">
+                  <div className="min-w-0">
+                    <p className="font-semibold">Pro 30 Hari · {rupiah(p.amount)}</p>
+                    <p className="truncate font-mono text-xs text-muted">{p.order_id}</p>
+                  </div>
+                  <span className="shrink-0 text-xs text-muted">{fmt(p.paid_at ?? p.created_at)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs text-muted">Ada kendala? Lihat <Link href="/kontak" className="underline">Kontak</Link> atau <Link href="/refund" className="underline">Kebijakan Refund</Link>.</p>
+          </>
         )}
       </main>
     </>

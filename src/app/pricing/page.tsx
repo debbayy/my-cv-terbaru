@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/server";
 import { isPro, PLANS, rupiah } from "@/lib/plans";
 import Link from "next/link";
@@ -61,6 +62,7 @@ export default async function Pricing() {
           </div>
         </div>
       </main>
+      <Footer />
     </>
   );
 }

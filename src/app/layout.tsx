@@ -1,9 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { appUrl } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "CVku — Bikin CV ATS dalam 10 Menit",
-  description: "Template CV ATS-friendly gratis. Isi, lihat hasilnya langsung, download PDF yang terbaca sistem rekrutmen.",
+  metadataBase: new URL(appUrl()),
+  title: "CVku — Bikin CV ATS & Kartu Ucapan Online",
+  description: "Template CV ATS-friendly dan kartu ucapan. Isi gratis tanpa daftar, lihat hasilnya langsung, download PDF/PNG siap kirim.",
+  keywords: ["CV ATS", "template CV", "buat CV online", "CV fresh graduate", "kartu ucapan", "kartu ulang tahun", "kartu lebaran"],
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    siteName: "CVku",
+    title: "CVku — Bikin CV ATS & Kartu Ucapan Online",
+    description: "Isi gratis tanpa daftar. Download PDF ATS-friendly & kartu ucapan PNG siap kirim WhatsApp.",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import CardPreview from "@/components/card-editor/CardPreview";
 import { CARD_TEMPLATES } from "@/lib/card-templates";
 import { OCCASIONS, type Occasion } from "@/lib/card";
@@ -47,6 +48,7 @@ export default function KartuGallery() {
           </section>
         ))}
       </main>
+      <Footer />
     </>
   );
 }

@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import CvPreview from "@/components/editor/CvPreview";
 import { sampleCv } from "@/lib/cv";
 import { TEMPLATES } from "@/lib/templates";
@@ -116,7 +117,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="border-t border-line py-8 text-center text-sm text-muted">© {new Date().getFullYear()} CVku</footer>
+      <Footer />
     </>
   );
 }
