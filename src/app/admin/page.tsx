@@ -19,6 +19,20 @@ export default async function Admin() {
   if (!user) redirect("/login?next=/admin");
   if (!ADMINS.includes((user.email ?? "").toLowerCase())) notFound();
 
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return (
+      <>
+        <Navbar />
+        <main className="mx-auto max-w-xl px-4 py-14">
+          <h1 className="text-xl font-bold">Admin belum bisa dibuka</h1>
+          <p className="mt-2 text-muted">
+            Env <code>SUPABASE_SERVICE_ROLE_KEY</code> belum di-set di Vercel (Settings → Environment Variables). Isi dengan Secret key
+            dari Supabase → Project Settings → API Keys, lalu Redeploy.
+          </p>
+        </main>
+      </>
+    );
+  }
   const db = createAdminClient();
   const since30 = new Date(Date.now() - 30 * 864e5).toISOString();
   const [{ data: pays }, { count: users }, { count: cvs }, { count: cards }, { data: pros }] = await Promise.all([
