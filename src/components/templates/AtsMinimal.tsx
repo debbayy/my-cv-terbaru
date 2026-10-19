@@ -1,4 +1,5 @@
 import { splitList, type CvData } from "@/lib/cv";
+import { tr } from "@/lib/cv-labels";
 import { Bullets, contactItems, dateRange } from "./parts";
 
 /** ATS Minimalis — padat & bersih, cocok untuk CV 1 halaman yang isinya banyak. */
@@ -10,7 +11,7 @@ export default function AtsMinimal({ data }: { data: CvData }) {
   return (
     <article className="tpl-minimal">
       <header>
-        <h1>{p.fullName || "Nama Lengkap"}</h1>
+        <h1>{p.fullName || tr(data, "Nama Lengkap")}</h1>
         <p className="meta">
           {[p.headline, ...contactItems(p)].filter(Boolean).join(" · ")}
         </p>
@@ -18,14 +19,14 @@ export default function AtsMinimal({ data }: { data: CvData }) {
 
       {p.summary && (
         <section>
-          <h2>Ringkasan</h2>
+          <h2>{tr(data, "Ringkasan")}</h2>
           <div className="body"><p>{p.summary}</p></div>
         </section>
       )}
 
       {data.experience.length > 0 && (
         <section>
-          <h2>Pengalaman</h2>
+          <h2>{tr(data, "Pengalaman")}</h2>
           <div className="body">
             {data.experience.map((e) => (
               <div key={e.id} className="item">
@@ -42,7 +43,7 @@ export default function AtsMinimal({ data }: { data: CvData }) {
 
       {data.education.length > 0 && (
         <section>
-          <h2>Pendidikan</h2>
+          <h2>{tr(data, "Pendidikan")}</h2>
           <div className="body">
             {data.education.map((e) => (
               <div key={e.id} className="item">
@@ -58,14 +59,14 @@ export default function AtsMinimal({ data }: { data: CvData }) {
 
       {skills.length > 0 && (
         <section>
-          <h2>Keahlian</h2>
+          <h2>{tr(data, "Keahlian")}</h2>
           <div className="body"><p>{skills.join(", ")}</p></div>
         </section>
       )}
 
       {data.certifications.length > 0 && (
         <section>
-          <h2>Sertifikasi</h2>
+          <h2>{tr(data, "Sertifikasi")}</h2>
           <div className="body">
             {data.certifications.map((c) => (
               <p key={c.id}>{c.name}{c.issuer && `, ${c.issuer}`}{c.year && ` (${c.year})`}</p>
@@ -76,7 +77,7 @@ export default function AtsMinimal({ data }: { data: CvData }) {
 
       {langs.length > 0 && (
         <section>
-          <h2>Bahasa</h2>
+          <h2>{tr(data, "Bahasa")}</h2>
           <div className="body"><p>{langs.join(", ")}</p></div>
         </section>
       )}

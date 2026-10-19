@@ -25,6 +25,8 @@ export type Certification = {
 };
 
 export type CvData = {
+  /** Bahasa judul bagian CV */
+  lang?: "id" | "en";
   personal: {
     fullName: string;
     headline: string;
@@ -33,6 +35,8 @@ export type CvData = {
     location: string;
     links: string; // pisah koma: linkedin.com/in/x, github.com/x
     summary: string;
+    /** Pas foto (data URL JPEG kecil). Hanya tampil di template desain bebas. */
+    photo?: string;
   };
   experience: Experience[];
   education: Education[];

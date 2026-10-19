@@ -287,3 +287,10 @@
 .tpl-dark .item { margin-bottom: 8pt; }
 
 @media print { .tpl-pastel, .tpl-dark { min-height: 296mm; } }
+
+/* ---------------- Pas foto (template desain bebas) ---------------- */
+.tpl-creative .avatar img, .tpl-pastel .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.tpl-creative .avatar:has(img), .tpl-pastel .avatar:has(img) { padding: 0; overflow: hidden; }
+.tpl-mheader header.has-photo { padding-right: 52mm; position: relative; }
+.tpl-mheader header .photo { position: absolute; right: 14mm; top: 50%; transform: translateY(-50%); width: 30mm; height: 30mm; border-radius: 50%; object-fit: cover; border: 1.2mm solid #f4a48e; }
+.tpl-dark .photo { width: 34mm; height: 40mm; object-fit: cover; border-radius: 2mm; margin-bottom: 6mm; border: .8mm solid #c3f73a; display: block; }

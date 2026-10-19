@@ -1,4 +1,5 @@
 import { splitList, type CvData } from "@/lib/cv";
+import { tr } from "@/lib/cv-labels";
 import { Bullets, contactItems, dateRange } from "./parts";
 
 /** ATS Modern — tetap 1 kolom & teks murni, tapi pakai aksen warna dan sans-serif. */
@@ -10,21 +11,21 @@ export default function AtsModern({ data }: { data: CvData }) {
   return (
     <article className="tpl-modern">
       <header>
-        <h1>{p.fullName || "Nama Lengkap"}</h1>
+        <h1>{p.fullName || tr(data, "Nama Lengkap")}</h1>
         {p.headline && <p className="headline">{p.headline}</p>}
         <p className="contact">{contactItems(p).join("  •  ")}</p>
       </header>
 
       {p.summary && (
         <section>
-          <h2>Profil</h2>
+          <h2>{tr(data, "Profil")}</h2>
           <p>{p.summary}</p>
         </section>
       )}
 
       {data.experience.length > 0 && (
         <section>
-          <h2>Pengalaman</h2>
+          <h2>{tr(data, "Pengalaman")}</h2>
           {data.experience.map((e) => (
             <div key={e.id} className="item">
               <div className="row">
@@ -43,7 +44,7 @@ export default function AtsModern({ data }: { data: CvData }) {
 
       {data.education.length > 0 && (
         <section>
-          <h2>Pendidikan</h2>
+          <h2>{tr(data, "Pendidikan")}</h2>
           {data.education.map((e) => (
             <div key={e.id} className="item">
               <div className="row">
@@ -61,14 +62,14 @@ export default function AtsModern({ data }: { data: CvData }) {
 
       {skills.length > 0 && (
         <section>
-          <h2>Keahlian</h2>
+          <h2>{tr(data, "Keahlian")}</h2>
           <p>{skills.join(" · ")}</p>
         </section>
       )}
 
       {data.certifications.length > 0 && (
         <section>
-          <h2>Sertifikasi</h2>
+          <h2>{tr(data, "Sertifikasi")}</h2>
           <ul>
             {data.certifications.map((c) => (
               <li key={c.id}>
@@ -83,7 +84,7 @@ export default function AtsModern({ data }: { data: CvData }) {
 
       {langs.length > 0 && (
         <section>
-          <h2>Bahasa</h2>
+          <h2>{tr(data, "Bahasa")}</h2>
           <p>{langs.join(" · ")}</p>
         </section>
       )}

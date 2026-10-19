@@ -6,7 +6,7 @@ import { getTemplate, TEMPLATES } from "@/lib/templates";
 import { rupiah } from "@/lib/plans";
 import { getAccess, showAds } from "@/lib/access";
 import AdSlot from "@/components/ads/AdSlot";
-import { deleteCard, deleteCv } from "./actions";
+import { deleteCard, deleteCv, duplicateCv } from "./actions";
 import { getCardTemplate } from "@/lib/card-templates";
 import { OCCASIONS } from "@/lib/card";
 
@@ -85,6 +85,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
                   </p>
                 </Link>
                 <Link href={`/editor/${cv.id}`} className="btn-ghost hidden py-1.5 sm:inline-flex">Edit</Link>
+                <form action={duplicateCv}>
+                  <input type="hidden" name="id" value={cv.id} />
+                  <button className="text-sm text-muted hover:text-ink hover:underline" title="Bikin versi lain untuk lowongan berbeda">Duplikat</button>
+                </form>
                 <form action={deleteCv}>
                   <input type="hidden" name="id" value={cv.id} />
                   <button className="text-sm text-red-600 hover:underline">Hapus</button>

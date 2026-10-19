@@ -1,4 +1,5 @@
 import { splitList, type CvData } from "@/lib/cv";
+import { tr } from "@/lib/cv-labels";
 import { Bullets, contactItems, dateRange } from "./parts";
 
 /**
@@ -13,21 +14,21 @@ export default function AtsFresh({ data }: { data: CvData }) {
   return (
     <article className="tpl-fresh">
       <header>
-        <h1>{p.fullName || "Nama Lengkap"}</h1>
+        <h1>{p.fullName || tr(data, "Nama Lengkap")}</h1>
         {p.headline && <p className="headline">{p.headline}</p>}
         <p className="contact">{contactItems(p).join("  |  ")}</p>
       </header>
 
       {p.summary && (
         <section>
-          <h2>Tentang Saya</h2>
+          <h2>{tr(data, "Tentang Saya")}</h2>
           <p>{p.summary}</p>
         </section>
       )}
 
       {data.education.length > 0 && (
         <section>
-          <h2>Pendidikan</h2>
+          <h2>{tr(data, "Pendidikan")}</h2>
           {data.education.map((e) => (
             <div key={e.id} className="item">
               <div className="row">
@@ -43,15 +44,15 @@ export default function AtsFresh({ data }: { data: CvData }) {
 
       {(skills.length > 0 || langs.length > 0) && (
         <section>
-          <h2>Keahlian</h2>
-          {skills.length > 0 && <p><strong>Hard skill:</strong> {skills.join(", ")}</p>}
-          {langs.length > 0 && <p><strong>Bahasa:</strong> {langs.join(", ")}</p>}
+          <h2>{tr(data, "Keahlian")}</h2>
+          {skills.length > 0 && <p><strong>{tr(data, "Hard skill:")}</strong> {skills.join(", ")}</p>}
+          {langs.length > 0 && <p><strong>{tr(data, "Bahasa:")}</strong> {langs.join(", ")}</p>}
         </section>
       )}
 
       {data.experience.length > 0 && (
         <section>
-          <h2>Pengalaman, Magang &amp; Organisasi</h2>
+          <h2>{tr(data, "Pengalaman, Magang & Organisasi")}</h2>
           {data.experience.map((e) => (
             <div key={e.id} className="item">
               <div className="row">
@@ -67,7 +68,7 @@ export default function AtsFresh({ data }: { data: CvData }) {
 
       {data.certifications.length > 0 && (
         <section>
-          <h2>Sertifikasi &amp; Pelatihan</h2>
+          <h2>{tr(data, "Sertifikasi & Pelatihan")}</h2>
           <ul>
             {data.certifications.map((c) => (
               <li key={c.id}>{c.name}{c.issuer && ` — ${c.issuer}`}{c.year && ` (${c.year})`}</li>

@@ -1,4 +1,5 @@
 import { splitList, type CvData } from "@/lib/cv";
+import { tr } from "@/lib/cv-labels";
 import { Bullets, dateRange } from "./parts";
 
 /** Creative — 2 kolom dengan sidebar berwarna. Bagus dilihat manusia, KURANG ramah ATS. */
@@ -17,16 +18,16 @@ export default function Creative({ data }: { data: CvData }) {
   return (
     <article className="tpl-creative">
       <aside>
-        <div className="avatar">{initials}</div>
+        <div className="avatar">{p.photo ? <img src={p.photo} alt="" /> : initials}</div>
         <div className="block">
-          <h4>Kontak</h4>
+          <h4>{tr(data, "Kontak")}</h4>
           {[p.email, p.phone, p.location, ...links].filter(Boolean).map((c, i) => (
             <p key={i}>{c}</p>
           ))}
         </div>
         {skills.length > 0 && (
           <div className="block">
-            <h4>Keahlian</h4>
+            <h4>{tr(data, "Keahlian")}</h4>
             <div className="chips">
               {skills.map((s) => (
                 <span key={s}>{s}</span>
@@ -36,7 +37,7 @@ export default function Creative({ data }: { data: CvData }) {
         )}
         {langs.length > 0 && (
           <div className="block">
-            <h4>Bahasa</h4>
+            <h4>{tr(data, "Bahasa")}</h4>
             {langs.map((l) => (
               <p key={l}>{l}</p>
             ))}
@@ -44,7 +45,7 @@ export default function Creative({ data }: { data: CvData }) {
         )}
         {data.certifications.length > 0 && (
           <div className="block">
-            <h4>Sertifikasi</h4>
+            <h4>{tr(data, "Sertifikasi")}</h4>
             {data.certifications.map((c) => (
               <p key={c.id}>
                 {c.name}
@@ -57,14 +58,14 @@ export default function Creative({ data }: { data: CvData }) {
 
       <main>
         <header>
-          <h1>{p.fullName || "Nama Lengkap"}</h1>
+          <h1>{p.fullName || tr(data, "Nama Lengkap")}</h1>
           {p.headline && <p className="headline">{p.headline}</p>}
         </header>
         {p.summary && <p className="summary">{p.summary}</p>}
 
         {data.experience.length > 0 && (
           <section>
-            <h2>Pengalaman</h2>
+            <h2>{tr(data, "Pengalaman")}</h2>
             {data.experience.map((e) => (
               <div key={e.id} className="item">
                 <span className="date">{dateRange(e.start, e.end)}</span>
@@ -78,7 +79,7 @@ export default function Creative({ data }: { data: CvData }) {
 
         {data.education.length > 0 && (
           <section>
-            <h2>Pendidikan</h2>
+            <h2>{tr(data, "Pendidikan")}</h2>
             {data.education.map((e) => (
               <div key={e.id} className="item">
                 <span className="date">{dateRange(e.start, e.end)}</span>

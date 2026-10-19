@@ -1,4 +1,5 @@
 import { splitList, type CvData } from "@/lib/cv";
+import { tr } from "@/lib/cv-labels";
 import { Bullets, contactItems, dateRange } from "./parts";
 
 /** Bold Timeline — nama besar, aksen kuning, kolom tanggal di kiri seperti timeline. */
@@ -11,7 +12,7 @@ export default function BoldTimeline({ data }: { data: CvData }) {
     <article className="tpl-bold">
       <header>
         <h1>
-          {(p.fullName || "Nama Lengkap").split(" ").map((w, i) => (
+          {(p.fullName || tr(data, "Nama Lengkap")).split(" ").map((w, i) => (
             <span key={i}>{w} </span>
           ))}
         </h1>
@@ -23,7 +24,7 @@ export default function BoldTimeline({ data }: { data: CvData }) {
 
       {data.experience.length > 0 && (
         <section>
-          <h2>Pengalaman</h2>
+          <h2>{tr(data, "Pengalaman")}</h2>
           {data.experience.map((e) => (
             <div key={e.id} className="tl">
               <div className="when">{dateRange(e.start, e.end)}</div>
@@ -39,7 +40,7 @@ export default function BoldTimeline({ data }: { data: CvData }) {
 
       {data.education.length > 0 && (
         <section>
-          <h2>Pendidikan</h2>
+          <h2>{tr(data, "Pendidikan")}</h2>
           {data.education.map((e) => (
             <div key={e.id} className="tl">
               <div className="when">{dateRange(e.start, e.end)}</div>
@@ -54,16 +55,16 @@ export default function BoldTimeline({ data }: { data: CvData }) {
 
       {(skills.length > 0 || langs.length > 0 || data.certifications.length > 0) && (
         <section>
-          <h2>Lainnya</h2>
+          <h2>{tr(data, "Lainnya")}</h2>
           {skills.length > 0 && (
-            <div className="tl"><div className="when">Keahlian</div><div className="what"><p>{skills.join(" / ")}</p></div></div>
+            <div className="tl"><div className="when">{tr(data, "Keahlian")}</div><div className="what"><p>{skills.join(" / ")}</p></div></div>
           )}
           {langs.length > 0 && (
-            <div className="tl"><div className="when">Bahasa</div><div className="what"><p>{langs.join(" / ")}</p></div></div>
+            <div className="tl"><div className="when">{tr(data, "Bahasa")}</div><div className="what"><p>{langs.join(" / ")}</p></div></div>
           )}
           {data.certifications.length > 0 && (
             <div className="tl">
-              <div className="when">Sertifikasi</div>
+              <div className="when">{tr(data, "Sertifikasi")}</div>
               <div className="what">
                 {data.certifications.map((c) => (
                   <p key={c.id}>{c.name}{c.issuer && `, ${c.issuer}`}{c.year && ` (${c.year})`}</p>

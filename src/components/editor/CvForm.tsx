@@ -1,5 +1,8 @@
 "use client";
-import { uid, type Certification, type CvData, type Education, type Experience } from "@/lib/cv";
+import { useState } from "react";
+import { emptyCv, uid, type Certification, type CvData, type Education, type Experience } from "@/lib/cv";
+import { photoToDataUrl } from "@/lib/photo";
+import AtsChecker from "./AtsChecker";
 
 type Props = { data: CvData; onChange: (d: CvData) => void };
 
@@ -59,6 +62,16 @@ function listOps<T extends { id: string }>(items: T[], set: (items: T[]) => void
 export default function CvForm({ data, onChange }: Props) {
   const p = data.personal;
   const setP = (patch: Partial<CvData["personal"]>) => onChange({ ...data, personal: { ...p, ...patch } });
+  const [photoErr, setPhotoErr] = useState<string | null>(null);
+
+  async function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (!f.type.startsWith("image/")) return setPhotoErr("File harus berupa gambar (JPG/PNG).");
+    setPhotoErr(null);
+    try { setP({ photo: await photoToDataUrl(f) }); } catch { setPhotoErr("Gagal membaca foto. Coba foto lain."); }
+  }
 
   const exp = listOps<Experience>(data.experience, (experience) => onChange({ ...data, experience }));
   const edu = listOps<Education>(data.education, (education) => onChange({ ...data, education }));
@@ -66,7 +79,47 @@ export default function CvForm({ data, onChange }: Props) {
 
   return (
     <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-white px-4 py-3">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-muted">Bahasa CV</span>
+          <div className="inline-flex rounded-lg border border-line p-0.5">
+            {(["id", "en"] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => onChange({ ...data, lang: l })}
+                className={`rounded-md px-2.5 py-1 text-xs font-semibold ${(data.lang ?? "id") === l ? "bg-brand text-white" : "text-muted"}`}
+              >
+                {l === "id" ? "Indonesia" : "English"}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button
+          type="button"
+          className="text-xs text-muted underline"
+          onClick={() => window.confirm("Hapus semua isian (termasuk contoh) dan mulai dari kosong?") && onChange({ ...emptyCv(), lang: data.lang })}
+        >
+          Mulai dari kosong
+        </button>
+      </div>
+
       <Section title="Data Diri">
+        <div className="flex items-center gap-3">
+          <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-paper text-xs text-muted">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {p.photo ? <img src={p.photo} alt="Pas foto" className="h-full w-full object-cover" /> : "Foto"}
+          </div>
+          <div className="min-w-0 text-sm">
+            <label className="btn-ghost cursor-pointer py-1.5">
+              {p.photo ? "Ganti foto" : "Upload pas foto"}
+              <input type="file" accept="image/*" className="hidden" onChange={pickPhoto} />
+            </label>
+            {p.photo && <button type="button" className="ml-2 text-xs text-red-600" onClick={() => setP({ photo: undefined })}>Hapus</button>}
+            <p className="mt-1 text-[11px] text-muted">Tampil di template desain bebas. Untuk lamaran via ATS sebaiknya tanpa foto.</p>
+            {photoErr && <p className="text-[11px] text-red-600">{photoErr}</p>}
+          </div>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Nama lengkap" value={p.fullName} onChange={(v) => setP({ fullName: v })} />
           <Field label="Posisi / headline" value={p.headline} onChange={(v) => setP({ headline: v })} placeholder="Frontend Developer" />
@@ -148,6 +201,13 @@ export default function CvForm({ data, onChange }: Props) {
           hint="Pakai istilah yang sama persis dengan lowongan — ATS mencocokkan kata kunci."
         />
         <Field label="Bahasa (pisah koma)" value={data.languages} onChange={(v) => onChange({ ...data, languages: v })} placeholder="Indonesia (Native), Inggris (Menengah)" />
+      </Section>
+
+      <Section title="🎯 Cek kecocokan dengan lowongan" defaultOpen={false}>
+        <AtsChecker
+          data={data}
+          onAddSkill={(k) => onChange({ ...data, skills: [data.skills, k].filter((x) => x.trim()).join(", ") })}
+        />
       </Section>
 
       <Section title={`Sertifikasi (${data.certifications.length})`} defaultOpen={false}>
