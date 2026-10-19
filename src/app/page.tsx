@@ -1,3 +1,5 @@
+import { FREE_MODE } from "@/lib/access";
+import PendingLink from "@/components/ui/PendingLink";
 import LoadingLink from "@/components/ui/LoadingLink";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -32,6 +34,7 @@ export default function Home() {
             </p>
             <div className="mt-7 grid gap-3 min-[420px]:flex min-[420px]:flex-wrap">
               <LoadingLink href="/new?template=ats-classic" className="btn-primary px-6 py-3 text-base">Buat CV Gratis</LoadingLink>
+              <PendingLink href="/import" className="btn-ghost px-6 py-3 text-base">📄 Upload CV Lama</PendingLink>
               <Link href="#template" className="btn-ghost px-6 py-3 text-base">Lihat Template</Link>
             </div>
           </div>
@@ -115,14 +118,26 @@ export default function Home() {
 
         <div className="mx-auto max-w-6xl px-4 pb-10"><Ad placement="landing" /></div>
 
-        {/* CTA HARGA */}
+        {/* CTA */}
         <section className="mx-auto max-w-6xl px-4 pb-20">
           <div className="flex flex-col items-start justify-between gap-6 rounded-2xl bg-brand-dark p-6 text-white sm:p-8 md:flex-row md:items-center">
-            <div>
-              <h2 className="font-display text-2xl font-bold sm:text-3xl">Edit gratis. Download CV & kartu mulai {rupiah(pro.price)}.</h2>
-              <p className="mt-1 text-white/70">{pro.tagline}. Bayar via QRIS, e-wallet, atau transfer bank.</p>
-            </div>
-            <Link href="/pricing" className="btn-gold px-6 py-3 text-base">Lihat Paket Pro</Link>
+            {FREE_MODE ? (
+              <>
+                <div>
+                  <h2 className="font-display text-2xl font-bold sm:text-3xl">Semua gratis untuk sementara 🎉</h2>
+                  <p className="mt-1 text-white/70">Edit, preview, dan download CV & kartu ucapan tanpa bayar dan tanpa iklan. Sudah punya CV lama? Upload, langsung terisi otomatis.</p>
+                </div>
+                <LoadingLink href="/new?template=ats-classic" className="btn-gold px-6 py-3 text-base">Buat CV Sekarang</LoadingLink>
+              </>
+            ) : (
+              <>
+                <div>
+                  <h2 className="font-display text-2xl font-bold sm:text-3xl">Edit gratis. Download CV & kartu mulai {rupiah(pro.price)}.</h2>
+                  <p className="mt-1 text-white/70">{pro.tagline}. Bayar via QRIS, e-wallet, atau transfer bank.</p>
+                </div>
+                <Link href="/pricing" className="btn-gold px-6 py-3 text-base">Lihat Paket Pro</Link>
+              </>
+            )}
           </div>
         </section>
       </main>

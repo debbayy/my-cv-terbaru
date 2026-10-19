@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getAccess, NO_ACCESS } from "@/lib/access";
+import { FREE_MODE, getAccess, NO_ACCESS } from "@/lib/access";
 import SignOutButton from "@/components/ui/SignOutButton";
 
 export default async function Navbar() {
@@ -20,7 +20,7 @@ export default async function Navbar() {
           <Link href="/pricing" className="hidden px-2 py-1 text-muted hover:text-ink min-[400px]:block">Harga</Link>
           {user ? (
             <>
-              {access.pro && (
+              {access.pro && !FREE_MODE && (
                 <span className="hidden rounded-full bg-gold px-2 py-0.5 text-xs font-bold min-[420px]:inline">{access.promax ? "PRO MAX" : "PRO"}</span>
               )}
               <Link href="/dashboard" className="btn-primary whitespace-nowrap px-3 sm:px-4">Akun Saya</Link>

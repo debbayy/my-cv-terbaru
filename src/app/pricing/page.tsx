@@ -2,7 +2,7 @@ import PendingLink from "@/components/ui/PendingLink";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/lib/supabase/server";
-import { getAccess, NO_ACCESS } from "@/lib/access";
+import { FREE_MODE, getAccess, NO_ACCESS } from "@/lib/access";
 import { PLANS, rupiah } from "@/lib/plans";
 import { TEMPLATES } from "@/lib/templates";
 import { CARD_TEMPLATES } from "@/lib/card-templates";
@@ -32,6 +32,11 @@ export default async function Pricing() {
         <h1 className="font-display text-center text-3xl font-bold sm:text-4xl">Harga simpel</h1>
         <p className="mt-2 text-center text-muted">Isi dan preview semua template selalu gratis. Coba download CV ATS gratis 1x.</p>
 
+        {FREE_MODE && (
+          <div className="mx-auto mt-6 max-w-2xl rounded-xl border border-brand/30 bg-brand/10 px-4 py-3 text-center text-sm text-brand">
+            🎉 <strong>Gratis untuk sementara!</strong> Semua template CV dan kartu ucapan bisa di-download tanpa bayar dan tanpa iklan. Paket di bawah akan berlaku nanti.
+          </div>
+        )}
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {/* GRATIS */}
           <div className="rounded-2xl border border-line bg-white p-6 sm:p-7">

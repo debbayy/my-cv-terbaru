@@ -13,13 +13,22 @@ export type Access = {
 /** Jumlah download gratis untuk akun tanpa paket. */
 export const FREE_DOWNLOADS = 1;
 
-export const NO_ACCESS: Access = { pro: false, promax: false, proUntil: null, promaxUntil: null, freeLeft: 0 };
+/**
+ * MODE GRATIS SEMENTARA: semua template CV & kartu terbuka untuk semua orang, tanpa iklan, tanpa bayar.
+ * Default aktif. Untuk menyalakan paywall lagi: set env NEXT_PUBLIC_FREE_MODE=false di Vercel lalu Redeploy.
+ */
+export const FREE_MODE = process.env.NEXT_PUBLIC_FREE_MODE !== "false";
+
+export const NO_ACCESS: Access = FREE_MODE
+  ? { pro: true, promax: true, proUntil: null, promaxUntil: null, freeLeft: 0 }
+  : { pro: false, promax: false, proUntil: null, promaxUntil: null, freeLeft: 0 };
 
 export const canDownload = (tier: Tier, a: Access) => (tier === "promax" ? a.promax : a.pro || a.promax);
 
 type Row = { pro_until?: string | null; promax_until?: string | null; free_downloads_used?: number | null };
 
 export const accessFrom = (p: Row | null | undefined): Access => {
+  if (FREE_MODE) return { ...NO_ACCESS, proUntil: p?.pro_until ?? null, promaxUntil: p?.promax_until ?? null };
   const promax = isPro(p?.promax_until);
   const pro = isPro(p?.pro_until) || promax;
   // Kolom belum ada (migration-004 belum jalan) → anggap kuota gratis tidak tersedia

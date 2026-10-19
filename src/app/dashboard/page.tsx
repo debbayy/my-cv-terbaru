@@ -4,10 +4,11 @@ import Navbar from "@/components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 import { getTemplate, TEMPLATES } from "@/lib/templates";
 import { rupiah } from "@/lib/plans";
-import { getAccess, showAds } from "@/lib/access";
+import { FREE_MODE, getAccess, showAds } from "@/lib/access";
 import AdSlot from "@/components/ads/AdSlot";
 import SubmitButton from "@/components/ui/SubmitButton";
 import SignOutButton from "@/components/ui/SignOutButton";
+import PendingLink from "@/components/ui/PendingLink";
 import LoadingLink from "@/components/ui/LoadingLink";
 import { deleteCard, deleteCv, duplicateCv } from "./actions";
 import { getCardTemplate } from "@/lib/card-templates";
@@ -44,7 +45,9 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <div>
             <h1 className="font-display text-3xl font-bold">CV Saya</h1>
             <p className="text-sm text-muted">
-              {pro ? (
+              {FREE_MODE ? (
+                <>🎉 Mode gratis sementara — semua template CV &amp; kartu terbuka, tanpa iklan</>
+              ) : pro ? (
                 access.promax ? (
                   <>Pro Max aktif sampai <strong>{fmt(access.promaxUntil!)}</strong> — semua template terbuka</>
                 ) : (
@@ -65,6 +68,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Mulai CV baru</h2>
         <div className="mb-10 flex flex-wrap gap-2 sm:gap-3">
+          <PendingLink href="/import" className="btn-primary">📄 Upload CV lama</PendingLink>
           {TEMPLATES.map((t) => (
             <LoadingLink key={t.id} href={`/new?template=${t.id}`} className="btn-ghost">
               + {t.name}

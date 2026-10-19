@@ -1,4 +1,5 @@
 "use client";
+import ImportCv, { summarize } from "@/components/import/ImportCv";
 import Spinner from "@/components/ui/Spinner";
 import { useState } from "react";
 import { emptyCv, uid, type Certification, type CvData, type Education, type Experience } from "@/lib/cv";
@@ -65,6 +66,7 @@ export default function CvForm({ data, onChange }: Props) {
   const setP = (patch: Partial<CvData["personal"]>) => onChange({ ...data, personal: { ...p, ...patch } });
   const [photoErr, setPhotoErr] = useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [importMsg, setImportMsg] = useState<{ text: string; warn: string[] } | null>(null);
 
   async function pickPhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -99,6 +101,15 @@ export default function CvForm({ data, onChange }: Props) {
             ))}
           </div>
         </div>
+        <div className="flex flex-wrap items-center gap-3">
+        <ImportCv
+          label="Import dari CV lama"
+          onDone={(r) => {
+            if (!window.confirm("Isi CV saat ini akan diganti dengan hasil baca dari file. Lanjut?")) return;
+            onChange({ ...r.data, personal: { ...r.data.personal, photo: p.photo } });
+            setImportMsg({ text: summarize(r), warn: r.warnings });
+          }}
+        />
         <button
           type="button"
           className="text-xs text-muted underline"
@@ -106,7 +117,15 @@ export default function CvForm({ data, onChange }: Props) {
         >
           Mulai dari kosong
         </button>
+        </div>
       </div>
+      {importMsg && (
+        <div className="rounded-xl border border-brand/30 bg-brand/10 px-4 py-3 text-sm text-brand" role="status">
+          <p className="font-semibold">✅ CV lama berhasil dibaca. {importMsg.text}</p>
+          <p className="text-xs">Cek lagi tiap bagian di bawah, lalu rapikan kalau ada yang kurang pas.</p>
+          {importMsg.warn.map((w) => <p key={w} className="mt-1 text-xs text-amber-700">⚠ {w}</p>)}
+        </div>
+      )}
 
       <Section title="Data Diri">
         <div className="flex items-center gap-3">

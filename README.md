@@ -93,6 +93,10 @@ supabase/schema.sql
 ## Update database
 Sudah pernah menjalankan `schema.sql` versi lama? Jalankan `supabase/migration-002-cards.sql` di SQL Editor untuk tabel kartu ucapan (atau jalankan ulang `schema.sql` — aman).
 
+## Mode gratis sementara & import CV lama
+- `FREE_MODE` (src/lib/access.ts) **aktif secara default**: semua template CV & kartu terbuka, tanpa iklan, tanpa bayar. Untuk menyalakan paywall lagi: set env `NEXT_PUBLIC_FREE_MODE=false` di Vercel lalu Redeploy.
+- Upload CV lama (`/import` dan tombol di editor): PDF/DOCX/TXT dibaca di `POST /api/cv/import` (unpdf + mammoth) lalu diparse heuristik oleh `src/lib/cv-import.ts` (judul bagian Indonesia & Inggris). File tidak disimpan. PDF hasil scan tidak didukung (tanpa OCR).
+
 ## Paket
 | Paket | Harga | Akses download |
 |---|---|---|
