@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/config";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -59,7 +60,20 @@ export default function LoginForm() {
     setLoading(false);
   }
 
+  // Cek apakah provider Google sudah aktif di Supabase, supaya tidak mendarat di halaman error JSON
+  const [googleOn, setGoogleOn] = useState<boolean | null>(null);
+  useEffect(() => {
+    fetch(`${SUPABASE_URL}/auth/v1/settings`, { headers: { apikey: SUPABASE_ANON_KEY } })
+      .then((r) => r.json())
+      .then((s) => setGoogleOn(!!s?.external?.google))
+      .catch(() => setGoogleOn(true));
+  }, []);
+
   async function google() {
+    if (googleOn === false) {
+      setMsg({ type: "error", text: explain("provider is not enabled") });
+      return;
+    }
     const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: callback() } });
     if (error) setMsg({ type: "error", text: explain(error.message) });
   }
