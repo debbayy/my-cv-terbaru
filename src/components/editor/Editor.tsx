@@ -7,7 +7,7 @@ import { saveBlob } from "@/lib/save-blob";
 import { createClient } from "@/lib/supabase/client";
 import type { CvData } from "@/lib/cv";
 import { TEMPLATES, getTemplate } from "@/lib/templates";
-import { canDownload, showAds, type Access } from "@/lib/access";
+import { FREE_MODE, canDownload, showAds, type Access } from "@/lib/access";
 import AdSlot from "@/components/ads/AdSlot";
 import Spinner from "@/components/ui/Spinner";
 import { PLANS, rupiah } from "@/lib/plans";
@@ -89,6 +89,29 @@ export default function Editor({
   async function download(opts?: { auto?: boolean }) {
     if (downloading || navigating) return; // cegah klik berulang
     setError(null);
+    // MODE GRATIS: PDF dibuat langsung dari isian yang sedang tampil — tanpa login, tanpa database.
+    if (FREE_MODE) {
+      setDownloading(true);
+      persist().catch(() => {}); // tetap simpan di latar belakang, tapi download tidak menunggu
+      try {
+        const res = await fetch("/api/cv/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ templateId, data }),
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          throw new Error(`Gagal membuat PDF. Coba lagi sebentar.${j.detail ? ` (${j.detail})` : ` (kode ${res.status})`}`);
+        }
+        const blob = await res.blob();
+        saveBlob(URL.createObjectURL(blob), `${(data.personal.fullName || title).replace(/[^\w\- ]+/g, "").trim() || "CV"} - CV.pdf`);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
+      } finally {
+        setDownloading(false);
+      }
+      return;
+    }
     // Tamu: simpan draft, lalu minta login. Setelah login, /claim memindahkan draft ke akun
     // dan membuka editor lagi dengan ?download=1 supaya alurnya langsung lanjut.
     if (guest || !id) {
@@ -166,8 +189,9 @@ export default function Editor({
         {error && <p className="bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
         {guest && (
           <p className="bg-brand/10 px-4 py-1.5 text-xs text-brand">
-            Kamu belum masuk — CV tersimpan otomatis di browser ini. Masuk saat download untuk menyimpannya ke akun.
-            {isAts && " CV ATS bisa di-download gratis 1x."}
+            {FREE_MODE
+              ? "CV tersimpan otomatis di browser ini. Download langsung, tanpa perlu login."
+              : <>Kamu belum masuk — CV tersimpan otomatis di browser ini. Masuk saat download untuk menyimpannya ke akun.{isAts && " CV ATS bisa di-download gratis 1x."}</>}
           </p>
         )}
         {tpl && !tpl.ats && (

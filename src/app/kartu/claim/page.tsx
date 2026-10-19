@@ -29,7 +29,7 @@ function Claim() {
         .select("id")
         .single();
       if (error || !data) {
-        setError("Gagal menyimpan kartu ke akun. Draft masih aman — coba muat ulang.");
+        setError(`Gagal menyimpan kartu ke akun (${error?.message ?? "tanpa respons"}). Draft masih aman — coba muat ulang.`);
         return;
       }
       clearCardDraft();

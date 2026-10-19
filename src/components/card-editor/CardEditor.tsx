@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { OCCASIONS, type CardData } from "@/lib/card";
 import { CARD_TEMPLATES, getCardTemplate } from "@/lib/card-templates";
 import { saveCardDraft } from "@/lib/card-draft";
-import { canDownload, showAds, type Access } from "@/lib/access";
+import { FREE_MODE, canDownload, showAds, type Access } from "@/lib/access";
 import AdSlot from "@/components/ads/AdSlot";
 import { saveBlob } from "@/lib/save-blob";
 import { PLANS, rupiah } from "@/lib/plans";
@@ -59,6 +59,28 @@ export default function CardEditor({
   async function download(format: Format) {
     if (busy || navigating) return;
     setError(null);
+    // MODE GRATIS: file dibuat langsung dari isian yang tampil — tanpa login, tanpa database.
+    if (FREE_MODE) {
+      setBusy(format);
+      persist().catch(() => {});
+      try {
+        const res = await fetch("/api/card/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ templateId, data, format }),
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          throw new Error(`Gagal membuat file. Coba lagi sebentar.${j.detail ? ` (${j.detail})` : ` (kode ${res.status})`}`);
+        }
+        await deliver(await res.blob(), format);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
+      } finally {
+        setBusy(null);
+      }
+      return;
+    }
     if (guest || !id) {
       await persist();
       const { data: { user } } = await supabase.auth.getUser();
@@ -84,7 +106,16 @@ export default function CardEditor({
         const j = await res.json().catch(() => ({}));
         throw new Error(`Gagal membuat file. Coba lagi sebentar.${j.detail ? ` (${j.detail})` : ""}`);
       }
-      const blob = await res.blob();
+      await deliver(await res.blob(), format);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function deliver(blob: Blob, format: Format) {
+    {
       const name = `Kartu - ${data.headline.replace(/[^\w\- ]+/g, "").trim() || "Ucapan"}.${format}`;
       // Di HP (iPhone/Android): buka menu Share → langsung kirim ke WhatsApp/IG. Desktop: download biasa.
       const file = new File([blob], name, { type: blob.type });
@@ -94,10 +125,6 @@ export default function CardEditor({
         try { await navigator.share({ files: [file], title: data.headline }); return; } catch { /* dibatalkan → fallback download */ }
       }
       saveBlob(URL.createObjectURL(blob), name);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
-    } finally {
-      setBusy(null);
     }
   }
 
@@ -137,7 +164,7 @@ export default function CardEditor({
         {error && <p className="bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>}
         {guest && (
           <p className="bg-brand/10 px-4 py-1.5 text-xs text-brand">
-            Belum masuk? Nggak apa-apa — kartu tersimpan di browser ini. Masuk saat download.
+            {FREE_MODE ? "Kartu tersimpan di browser ini. Download langsung, tanpa perlu login." : "Belum masuk? Nggak apa-apa — kartu tersimpan di browser ini. Masuk saat download."}
           </p>
         )}
 

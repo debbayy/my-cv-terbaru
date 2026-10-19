@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     "/api/cv/*/pdf": ["./node_modules/@sparticuz/chromium/bin/**"],
     "/api/card/*/export": ["./node_modules/@sparticuz/chromium/bin/**"],
     "/api/health": ["./node_modules/@sparticuz/chromium/bin/**"],
+    "/api/cv/render": ["./node_modules/@sparticuz/chromium/bin/**"],
+    "/api/card/render": ["./node_modules/@sparticuz/chromium/bin/**"],
   },
 };
 

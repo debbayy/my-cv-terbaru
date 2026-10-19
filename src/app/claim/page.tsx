@@ -31,7 +31,7 @@ export default function ClaimPage() {
         .single();
 
       if (error || !data) {
-        setError("Gagal menyimpan CV ke akun kamu. Draft masih aman di browser — coba muat ulang halaman ini.");
+        setError(`Gagal menyimpan CV ke akun kamu (${error?.message ?? "tanpa respons"}). Draft masih aman di browser — coba muat ulang halaman ini.`);
         return;
       }
       clearDraft();
